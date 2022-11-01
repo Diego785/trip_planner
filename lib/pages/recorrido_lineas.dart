@@ -57,9 +57,10 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
                       },
                     ),
                   ),
-                )
+                ),
 
                 //BUSCADOR
+                const SearchBar(),
               ],
             ),
           );
