@@ -5,6 +5,7 @@ class Lineas {
   Lineas({
     required this.id,
     required this.name,
+    
   });
 
   factory Lineas.fromMap(Map<String, dynamic> obj) =>

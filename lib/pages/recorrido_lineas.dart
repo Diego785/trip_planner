@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:trip_planner/utils/responsive.dart';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class RecorridoLineas extends StatefulWidget {
   const RecorridoLineas({super.key});
@@ -10,34 +10,17 @@ class RecorridoLineas extends StatefulWidget {
 }
 
 class _RecorridoLineasState extends State<RecorridoLineas> {
+  static final CameraPosition _kLake = CameraPosition(
+      bearing: 192.8334901395799,
+      target: LatLng(37.43296265331129, -122.08832357078792),
+      tilt: 59.440717697143555,
+      zoom: 19.151926040649414);
   @override
   Widget build(BuildContext context) {
-    final Responsive responsive = Responsive.of(context);
-    return Scaffold(
-      body: Container(
-          width: double.infinity,
-          height: responsive.height,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-                colors: [Colors.white, Color.fromARGB(255, 155, 211, 157)]),
-          ),
-          child: Stack(alignment: Alignment.center, children: <Widget>[
-            Positioned(
-              left: 15,
-              top: 15,
-              child: SafeArea(
-                child: CupertinoButton(
-                  color: Colors.black26,
-                  padding: EdgeInsets.all(10),
-                  borderRadius: BorderRadius.circular(40),
-                  child: Icon(Icons.arrow_back_outlined),
-                  onPressed: () {
-                    Navigator.pushNamed(context, 'home');
-                  },
-                ),
-              ),
-            ),
-          ])),
+    return new Scaffold(
+      body: GoogleMap(
+        initialCameraPosition: _kLake,
+      ),
     );
   }
 }
