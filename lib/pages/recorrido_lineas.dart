@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trip_planner/blocs/blocs.dart';
+import 'package:trip_planner/views/map_view.dart';
 
 class RecorridoLineas extends StatefulWidget {
   const RecorridoLineas({super.key});
@@ -10,16 +11,41 @@ class RecorridoLineas extends StatefulWidget {
 }
 
 class _RecorridoLineasState extends State<RecorridoLineas> {
-  static final CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
+  late LocationBloc locationBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    locationBloc = BlocProvider.of<LocationBloc>(context);
+    // locationBloc.getCurrentPosition();
+    locationBloc.startFollowingUser();
+  }
+
+  @override
+  void dispose() {
+    locationBloc.stopFollowingUser();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      body: GoogleMap(
-        initialCameraPosition: _kLake,
+    return Scaffold(
+      body: BlocBuilder<LocationBloc, LocationState>(
+        builder: (context, state) {
+          if (state.lastKnownLocation == null) {
+            return const Center(child: Text('Espere por favor...'));
+          }
+          print('aqui estoy');
+          return SingleChildScrollView(
+            child: Stack(
+              children: [
+                MapView(initialLocation: state.lastKnownLocation!)
+
+                // TODO: botones...
+              ],
+            ),
+          );
+        },
       ),
     );
   }

@@ -6,7 +6,11 @@ import 'package:trip_planner/screens/loading_screen.dart';
 
 void main() {
   runApp(MultiBlocProvider(
-    providers: [BlocProvider(create: (context) => GpsBloc())],
+    providers: [
+      BlocProvider(create: (context) => GpsBloc()),
+      BlocProvider(create: (context) => LocationBloc()),
+      BlocProvider(create: (context) => MapBloc()),
+    ],
     child: const MainClass(),
   ));
 }
