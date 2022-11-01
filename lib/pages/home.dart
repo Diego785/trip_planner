@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:trip_planner/utils/responsive.dart';
+import 'package:trip_planner/ui/responsive.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
