@@ -14,11 +14,11 @@ class _HomePageState extends State<HomePage> {
     final Responsive responsive = Responsive.of(context);
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Colors.black45,
-        backgroundColor: Colors.green[200],
-        elevation: 1,
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.lightGreen[400],
+        elevation: 3,
         title: const Text(
-          'Trip Planner Project',
+          ' Trip Planner Project',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -28,7 +28,13 @@ class _HomePageState extends State<HomePage> {
         // color: Colors.white60,
         decoration: const BoxDecoration(
             gradient: LinearGradient(
-                colors: [Colors.white, Color.fromARGB(255, 155, 211, 157)])),
+          colors: [
+            Colors.white,
+            Colors.lightGreen,
+          ],
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+        )),
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
@@ -40,7 +46,7 @@ class _HomePageState extends State<HomePage> {
                   },
                   padding: EdgeInsets.all(15),
                   elevation: 3,
-                  color: Colors.lightGreen,
+                  color: Colors.lightGreen[400],
                   child: Row(
                     children: const <Widget>[
                       Text(
@@ -86,7 +92,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {},
                   padding: EdgeInsets.all(15),
                   elevation: 3,
-                  color: Color.fromARGB(255, 198, 231, 159),
+                  color: Color.fromARGB(255, 209, 240, 174),
                   child: Row(
                     children: const <Widget>[
                       Text(

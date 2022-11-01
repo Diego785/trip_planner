@@ -8,17 +8,28 @@ class GpsAccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: BlocBuilder<GpsBloc, GpsState>(
-        builder: (context, state) {
-          print('state: $state');
-          return !state.isGpsEnabled
-              ? const _EnableGpsMessage()
-              : const _AccessButton();
-        },
-      )
-          //  _AccessButton(),
-          //  child: _EnableGpsMessage()
-          ),
+      body: Container(
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+          colors: [
+            Colors.white,
+            Colors.lightGreen,
+          ],
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+        )),
+        child: Center(child: BlocBuilder<GpsBloc, GpsState>(
+          builder: (context, state) {
+            print('state: $state');
+            return !state.isGpsEnabled
+                ? const _EnableGpsMessage()
+                : const _AccessButton();
+          },
+        )
+            //  _AccessButton(),
+            //  child: _EnableGpsMessage()
+            ),
+      ),
     );
   }
 }
@@ -35,9 +46,12 @@ class _AccessButton extends StatelessWidget {
       children: [
         const Text('Es necesario el acceso a GPS'),
         MaterialButton(
-            child: const Text('Solicitar Acceso',
-                style: TextStyle(color: Colors.white)),
-            color: Colors.black,
+            child: const Text(
+              'Solicitar Acceso',
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            ),
+            color: Colors.lightGreen,
             shape: const StadiumBorder(),
             elevation: 0,
             splashColor: Colors.transparent,
@@ -59,7 +73,10 @@ class _EnableGpsMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Text(
       'Debe de habilitar el GPS',
-      style: TextStyle(fontSize: 25, fontWeight: FontWeight.w300),
+      style: TextStyle(
+        fontSize: 25,
+        fontWeight: FontWeight.w400,
+      ),
     );
   }
 }
