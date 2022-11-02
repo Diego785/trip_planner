@@ -5,6 +5,7 @@ import 'package:trip_planner/pages/recorrido_lineas.dart';
 import 'package:trip_planner/screens/loading_screen.dart';
 
 void main() {
+
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(create: (context) => GpsBloc()),
@@ -18,7 +19,7 @@ void main() {
 class MainClass extends StatelessWidget {
   const MainClass({super.key});
 
-  @override
+    @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Trip Planner Project',

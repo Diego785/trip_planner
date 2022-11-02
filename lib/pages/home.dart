@@ -13,6 +13,99 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final Responsive responsive = Responsive.of(context);
     return Scaffold(
+      drawer: Drawer(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          // color: Colors.white60,
+          decoration: const BoxDecoration(
+              gradient: LinearGradient(
+            colors: [
+              Colors.green,
+              Colors.lightGreen,
+            ],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+          )),
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 30),
+                width: 150,
+                height: 150,
+                child: Image.asset("assets/logo.png"),
+              ),
+              const Text(
+                "Trip Planner SC",
+                style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 30,
+                    color: Colors.white),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Text(
+                "Líneas de Micros Disponibles",
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                  color: Colors.green.shade900,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 30),
+                padding: const EdgeInsets.all(20),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: Image.asset("assets/logo.png"),
+                      title: const Text(
+                        "Linea 1",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ListTileStyle.list,
+                      onTap: () {},
+                    ),
+                    const Divider(),
+                    ListTile(
+                      leading: Image.asset("assets/logo.png"),
+                      title: const Text(
+                        "Linea 2",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ListTileStyle.list,
+                      onTap: () {},
+                    ),
+                    const Divider(),
+                    ListTile(
+                      leading: Image.asset("assets/logo.png"),
+                      title: const Text(
+                        "Linea 3",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ListTileStyle.list,
+                      onTap: () {},
+                    ),
+                    const Divider(),
+                    ListTile(
+                      leading: Image.asset("assets/logo.png"),
+                      title: const Text(
+                        "Linea 4",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ListTileStyle.list,
+                      onTap: () {},
+                    ),
+                    const Divider(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       appBar: AppBar(
         foregroundColor: Colors.black,
         backgroundColor: Colors.lightGreen[400],

@@ -9,7 +9,8 @@ class LoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: BlocBuilder<GpsBloc, GpsState>(
+    return Scaffold(
+    body: BlocBuilder<GpsBloc, GpsState>(
       builder: (context, state) {
         return state.isAllGranted ? const HomePage() : const GpsAccessScreen();
       },
