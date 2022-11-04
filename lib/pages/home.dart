@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:trip_planner/complements/loading_page.dart';
 import 'package:trip_planner/ui/responsive.dart';
-import 'package:trip_planner/widgets/dinamic_search.dart';
+import 'package:trip_planner/widgets/my_searching_drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,54 +11,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-
-
   @override
   Widget build(BuildContext context) {
     final Responsive responsive = Responsive.of(context);
     return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 2000,
-              // color: Colors.white60,
-              decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                colors: [
-                  Colors.green,
-                  Colors.lightGreen,
-                ],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-              )),
-              child: Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 30),
-                      width: 150,
-                      height: 150,
-                      child: Image.asset("assets/logo.png"),
-                    ),
-                    const Text(
-                      "Trip Planner SC",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 30,
-                          color: Colors.white),
-                    ),
-                      
-                    DinamicSearch(),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      drawer: MySearchingDrawer(),
       appBar: AppBar(
         foregroundColor: Colors.black,
         backgroundColor: Colors.lightGreen[400],
