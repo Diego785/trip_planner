@@ -7,11 +7,23 @@ class LoadingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green.shade700,
-      body: Center(
-        child: SpinKitCircle(
-          size: 140,
-          color: Colors.white,
+      body: Container(
+      width: double.infinity,
+      height: double.infinity,
+       decoration: const BoxDecoration(
+                gradient: LinearGradient(
+              colors: [
+                Colors.white,
+                Colors.lightGreen,
+              ],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+            )),
+        child:  Center(
+          child: SpinKitCircle(
+            size: 140,
+            color: Colors.green[900],
+          ),
         ),
       ),
     );

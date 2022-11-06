@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trip_planner/blocs/blocs.dart';
 import 'package:trip_planner/views/map_view.dart';
+import 'package:trip_planner/widgets/my_float_action_button.dart';
+import 'package:trip_planner/widgets/my_searching_drawer.dart';
 import 'package:trip_planner/widgets/widgets.dart';
 
 class RecorridoLineas extends StatefulWidget {
@@ -32,6 +34,7 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: MySearchingDrawer(),
       body: BlocBuilder<LocationBloc, LocationState>(
         builder: (context, state) {
           if (state.lastKnownLocation == null) {
@@ -49,7 +52,7 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
                   child: SafeArea(
                     child: CupertinoButton(
                       color: Colors.black26,
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       borderRadius: BorderRadius.circular(40),
                       child: Icon(Icons.arrow_back_outlined),
                       onPressed: () {
@@ -61,6 +64,16 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
 
                 //BUSCADOR
                 const SearchBar(),
+                Positioned(
+                left: MediaQuery.of(context).size.width-70,
+                top: MediaQuery.of(context).size.height-325,
+                    child: FloatingActionButton(
+                  backgroundColor: Colors.green[800],
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                  child: const Icon(
+                    Icons.search,
+                  ),
+                )),
               ],
             ),
           );

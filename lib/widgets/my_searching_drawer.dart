@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:trip_planner/complements/loading_page.dart';
@@ -121,8 +122,49 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                           fontSize: 30,
                           color: Colors.white),
                     ),
+                    const SizedBox(
+                          height: 20,
+                        ),
+                        //IMPLEMEN
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //IMPLEMENTAR LA SEGUNDA FUNCIONALIDAD
+                        Column(
+                          children: [
+                            FloatingActionButton(
+                              backgroundColor: Colors.green[800],
+                              onPressed: () => {},
+                              child:  const Icon(
+                                Icons.person_pin,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 5,),
+                            Text("2da. Funcionalidad", style: TextStyle(color: Colors.green[900], fontSize: 13),),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 50,
+                        ),
+                        //IMPLEMENTAR LA TERCERA FUNCIONALIDAD
+                        Column(
+                          children: [
+                            FloatingActionButton(
+                              backgroundColor: Colors.green[800],
+                              onPressed: () => {},
+                              child: const Icon(
+                                Icons.bus_alert,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 5,),
+                                Text("1ra. Funcionalidad", style: TextStyle(color: Colors.green[900], fontSize: 13),),
+                          ],
+                        ),
+                      ],
+                    ),
                     Container(
-                      margin: const EdgeInsets.only(top: 10),
                       padding: const EdgeInsets.all(20),
                       width: 1000,
                       child: Expanded(
@@ -180,6 +222,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                   leading: Image.asset("assets/logo.png"),
                                 ),
                               ),*/
+
                                 // MOSTRAR LA LISTA DE MICROS
                                 ListView.builder(
                                     shrinkWrap: true,
@@ -200,8 +243,8 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                             showModalBottomSheet(
                                                 backgroundColor:
                                                     Colors.transparent,
-                                                barrierColor:
-                                                    Colors.transparent,
+                                                barrierColor: Colors.transparent
+                                                    .withOpacity(0.2),
                                                 context: context,
                                                 builder: (_) {
                                                   return Container(
@@ -239,7 +282,10 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 .green.shade900,
                                                             onTap: () {
                                                               //AQUÍ COLOCAR LA POLYLINE DE LA IDA
-                                                              print("Id del micro: " + _listLineasGet[index].id);
+                                                              print("Id del micro: " +
+                                                                  _listLineasGet[
+                                                                          index]
+                                                                      .id);
                                                             },
                                                           ),
 
@@ -253,8 +299,10 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 .green.shade900,
                                                             onTap: () {
                                                               //AQUÍ COLOCAR LA POLYLINE DE LA VUELTA
-                                                              print("Id del micro: " + _listLineasGet[index].id);
-                                                            
+                                                              print("Id del micro: " +
+                                                                  _listLineasGet[
+                                                                          index]
+                                                                      .id);
                                                             },
                                                           ),
                                                         ],
@@ -264,6 +312,305 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                 });
                                             return false;
                                           } else {
+                                            showModalBottomSheet(
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                barrierColor: Colors.transparent
+                                                    .withOpacity(0.2),
+                                                context: context,
+                                                builder: (_) {
+                                                  return Container(
+                                                    height: 550,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(
+                                                              0xFF2e3253)
+                                                          .withOpacity(0.4),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .only(
+                                                        topLeft:
+                                                            Radius.circular(20),
+                                                        topRight:
+                                                            Radius.circular(20),
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                        left: 20,
+                                                        right: 20,
+                                                      ),
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          // Colocar los botones
+                                                          Text(
+                                                            "Información del Micro: ",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 30,
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        90),
+                                                            child: Image.asset(
+                                                              _listLineasGet[
+                                                                      index]
+                                                                  .foto,
+                                                              width: 100,
+                                                              height: 100,
+                                                              fit: BoxFit.cover,
+                                                              scale: 10,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                "Id: ",
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              Text(
+                                                                _listLineasGet[
+                                                                        index]
+                                                                    .id,
+                                                                style: TextStyle(
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                "Código: ",
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              Text(
+                                                                _listLineasGet[
+                                                                        index]
+                                                                    .code,
+                                                                style: TextStyle(
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                "Dirección: ",
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              Text(
+                                                                _listLineasGet[
+                                                                        index]
+                                                                    .direccion,
+                                                                style: TextStyle(
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                "Teléfono: ",
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              Text(
+                                                                _listLineasGet[
+                                                                        index]
+                                                                    .telefono,
+                                                                style: TextStyle(
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                "Email: ",
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              Text(
+                                                                _listLineasGet[
+                                                                        index]
+                                                                    .email,
+                                                                style: TextStyle(
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                "Descripción: ",
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 200,
+                                                                child: Text(
+                                                                  _listLineasGet[
+                                                                          index]
+                                                                      .descripcion,
+                                                                  style: TextStyle(
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .italic,
+                                                                      fontSize:
+                                                                          20,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Colors
+                                                                          .black),
+                                                                  maxLines: 2,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                });
                                             return false;
                                           }
                                         },
@@ -277,14 +624,26 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                           selected: true,
                                           title: Text(
                                             _listLineasGet[index].code,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
+                                            style: TextStyle(
+                                                color: Colors.green.shade900,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20),
+                                          ),
+                                          leading: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            child: Image.asset(
+                                              _listLineasGet[index].foto,
+                                              width: 100,
+                                              height: 100,
+                                              scale: 10,
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
-                                          leading:
-                                              Image.asset("assets/logo.png"),
-                                              trailing: const Icon(Icons.arrow_circle_right_sharp, color: Colors.white,),
+                                          trailing: const Icon(
+                                            Icons.compare_arrows,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       );
                                     }
