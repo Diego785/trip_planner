@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class MyFloatActionButton extends StatelessWidget {
   final void Function()? onTap;
   final IconData icon;
-  MyFloatActionButton({
+  const MyFloatActionButton({
     super.key,
     required this.onTap,
     required this.icon,
@@ -21,7 +21,7 @@ class MyFloatActionButton extends StatelessWidget {
             color: Colors.grey.withOpacity(0.9),
             spreadRadius: 5,
             blurRadius: 7,
-            offset: Offset(0, 10), // changes position of shadow
+            offset: const Offset(0, 10), // changes position of shadow
           ),
         ]),
         width: 80,

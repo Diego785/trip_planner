@@ -70,22 +70,21 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
     super.initState();
     _getLineas();
   }
-
-  @override
-  final leftEditIcon = Container(
+final leftEditIcon = Container(
     margin: const EdgeInsets.only(bottom: 10),
-    color: Color.fromARGB(255, 94, 102, 168).withOpacity(0.5),
-    child: const Icon(Icons.visibility, color: Colors.white),
+    color: const Color.fromARGB(255, 94, 102, 168).withOpacity(0.5),
     alignment: Alignment.center,
+    child: const Icon(Icons.visibility, color: Colors.white),
   );
 
   final rightEditIcon = Container(
     margin: const EdgeInsets.only(bottom: 10),
-    color: Color.fromARGB(255, 94, 102, 168).withOpacity(0.5),
-    child: const Icon(Icons.cancel, color: Colors.white),
+    color: const Color.fromARGB(255, 94, 102, 168).withOpacity(0.5),
     alignment: Alignment.center,
+    child: const Icon(Icons.info, color: Colors.white),
   );
 
+  @override
   Widget build(BuildContext context) {
     if (_listLineasGet.isEmpty) {
       return const LoadingPage();
@@ -140,7 +139,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 5,),
+                            const SizedBox(height: 5,),
                             Text("2da. Funcionalidad", style: TextStyle(color: Colors.green[900], fontSize: 13),),
                           ],
                         ),
@@ -184,7 +183,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                             ),
                             TextField(
                               onChanged: (value) => updateList(value),
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                               decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.green,
@@ -226,7 +225,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                 // MOSTRAR LA LISTA DE MICROS
                                 ListView.builder(
                                     shrinkWrap: true,
-                                    padding: EdgeInsets.all(10),
+                                    padding: const EdgeInsets.all(10),
                                     itemCount: _listLineasGet.length,
                                     itemBuilder: (context, index) {
                                       return Dismissible(
@@ -346,7 +345,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 .center,
                                                         children: [
                                                           // Colocar los botones
-                                                          Text(
+                                                          const Text(
                                                             "Información del Micro: ",
                                                             style: TextStyle(
                                                                 fontWeight:
@@ -356,7 +355,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 color: Colors
                                                                     .white),
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 10,
                                                           ),
 
@@ -375,7 +374,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                               scale: 10,
                                                             ),
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 10,
                                                           ),
 
@@ -384,7 +383,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 MainAxisAlignment
                                                                     .center,
                                                             children: [
-                                                              Text(
+                                                              const Text(
                                                                 "Id: ",
                                                                 style: TextStyle(
                                                                     fontWeight:
@@ -399,7 +398,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 _listLineasGet[
                                                                         index]
                                                                     .id,
-                                                                style: TextStyle(
+                                                                style: const TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -413,7 +412,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                               ),
                                                             ],
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 10,
                                                           ),
 
@@ -422,7 +421,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 MainAxisAlignment
                                                                     .center,
                                                             children: [
-                                                              Text(
+                                                              const Text(
                                                                 "Código: ",
                                                                 style: TextStyle(
                                                                     fontWeight:
@@ -437,7 +436,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 _listLineasGet[
                                                                         index]
                                                                     .code,
-                                                                style: TextStyle(
+                                                                style: const TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -451,7 +450,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                               ),
                                                             ],
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 10,
                                                           ),
 
@@ -460,7 +459,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 MainAxisAlignment
                                                                     .center,
                                                             children: [
-                                                              Text(
+                                                              const Text(
                                                                 "Dirección: ",
                                                                 style: TextStyle(
                                                                     fontWeight:
@@ -475,7 +474,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 _listLineasGet[
                                                                         index]
                                                                     .direccion,
-                                                                style: TextStyle(
+                                                                style: const TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -489,7 +488,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                               ),
                                                             ],
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 10,
                                                           ),
 
@@ -498,7 +497,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 MainAxisAlignment
                                                                     .center,
                                                             children: [
-                                                              Text(
+                                                              const Text(
                                                                 "Teléfono: ",
                                                                 style: TextStyle(
                                                                     fontWeight:
@@ -509,11 +508,11 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                     color: Colors
                                                                         .white),
                                                               ),
-                                                              Text(
+                                                               Text(
                                                                 _listLineasGet[
                                                                         index]
                                                                     .telefono,
-                                                                style: TextStyle(
+                                                                style: const TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -527,7 +526,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                               ),
                                                             ],
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 10,
                                                           ),
 
@@ -536,7 +535,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 MainAxisAlignment
                                                                     .center,
                                                             children: [
-                                                              Text(
+                                                              const Text(
                                                                 "Email: ",
                                                                 style: TextStyle(
                                                                     fontWeight:
@@ -551,7 +550,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 _listLineasGet[
                                                                         index]
                                                                     .email,
-                                                                style: TextStyle(
+                                                                style: const TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -565,7 +564,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                               ),
                                                             ],
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 10,
                                                           ),
                                                           Row(
@@ -573,7 +572,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                 MainAxisAlignment
                                                                     .center,
                                                             children: [
-                                                              Text(
+                                                              const Text(
                                                                 "Descripción: ",
                                                                 style: TextStyle(
                                                                     fontWeight:
@@ -590,7 +589,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                   _listLineasGet[
                                                                           index]
                                                                       .descripcion,
-                                                                  style: TextStyle(
+                                                                  style: const TextStyle(
                                                                       fontStyle:
                                                                           FontStyle
                                                                               .italic,
