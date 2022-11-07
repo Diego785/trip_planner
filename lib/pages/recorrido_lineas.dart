@@ -46,7 +46,7 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
               children: [
                 MapView(initialLocation: state.lastKnownLocation!),
                 //buttom para atras
-                Positioned(
+                /*Positioned(
                   left: 15,
                   top: 15,
                   child: SafeArea(
@@ -60,20 +60,24 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
                       },
                     ),
                   ),
-                ),
+                ),*/
 
                 //BUSCADOR
-                const SearchBar(),
+                //const SearchBar(),
                 Positioned(
-                left: MediaQuery.of(context).size.width-70,
-                top: MediaQuery.of(context).size.height-325,
-                    child: FloatingActionButton(
+                left: MediaQuery.of(context).size.width-68,
+                top: MediaQuery.of(context).size.height-318,
+                    child: SizedBox(
+                    height: 50,
+                    width: 50,
+                      child: FloatingActionButton(
                   backgroundColor: Colors.green[800],
                   onPressed: () => Scaffold.of(context).openDrawer(),
                   child: const Icon(
-                    Icons.search,
+                      Icons.search,
                   ),
-                )),
+                ),
+                    )),
               ],
             ),
           );

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:trip_planner/complements/loading_page.dart';
 import 'package:trip_planner/helpers/helpers.dart';
 import 'package:trip_planner/models/models.dart';
 import 'package:trip_planner/providers/providers.dart';
@@ -10,6 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:trip_planner/widgets/my_searching_drawer.dart';
 
 class MapPolylinesScreen extends StatefulWidget {
   final int recorrido;
@@ -182,28 +185,78 @@ class _MapPolylinesScreenState extends State<MapPolylinesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (this._polyline.isEmpty) return const LoadingPage();
+
     return Scaffold(body: Center(
         child: Consumer<PuntosProvider>(builder: (context, value, child) {
-      if (value.punto == null) {
-        return const CircularProgressIndicator();
-      }
       return Scaffold(
+        endDrawer: MySearchingDrawer(),
         appBar: AppBar(
           title: Text('Línea $lineaMicro'),
+          backgroundColor: Colors.green.shade800,
         ),
-        body: SafeArea(
-          child: GoogleMap(
-            initialCameraPosition: _kGooglePlex,
-            markers: _markers,
-            mapType: MapType.normal,
-            myLocationEnabled: true,
-            compassEnabled: false,
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-            },
-            polylines: _polyline,
-          ),
-        ),
+        body: Builder(builder: (context) {
+          return SafeArea(
+            child: Stack(children: [
+              GoogleMap(
+                initialCameraPosition: _kGooglePlex,
+                markers: _markers,
+                mapType: MapType.normal,
+                myLocationEnabled: true,
+                compassEnabled: false,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                },
+                polylines: _polyline,
+              ),
+              Positioned(
+                left: MediaQuery.of(context).size.width - 50,
+                top: MediaQuery.of(context).size.height - 370,
+                child: SizedBox(
+                width: 50,
+                height: 50,
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.green[800],
+                    onPressed: () => Scaffold.of(context).openEndDrawer(),
+                    child: const Icon(
+                      Icons.search,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: MediaQuery.of(context).size.width - 50,
+                top: MediaQuery.of(context).size.height - 310,
+                child: SizedBox(
+                width: 50,
+                height: 50,
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.green[800],
+                    onPressed: () {},
+                    child: const Icon(
+                      Icons.place,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: MediaQuery.of(context).size.width - 50,
+                top: MediaQuery.of(context).size.height - 250,
+                child: SizedBox(
+                width: 50,
+                height: 50,
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.green[800],
+                    onPressed: () {},
+                    child: const Icon(
+                      Icons.bus_alert,
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+          );
+        }),
       );
     })));
     //

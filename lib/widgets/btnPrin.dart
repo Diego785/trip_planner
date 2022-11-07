@@ -19,7 +19,7 @@ class Btnprincipales extends StatelessWidget {
             maxRadius: 25,
             child: IconButton(
                 icon: const Icon(
-                  Icons.bus_alert,
+                  Icons.place,
                   color: Colors.black,
                 ),
                 onPressed: () {}),
@@ -31,7 +31,7 @@ class Btnprincipales extends StatelessWidget {
             backgroundColor: Colors.white,
             maxRadius: 25,
             child: IconButton(
-                icon: const Icon(Icons.place, color: Colors.black),
+                icon: const Icon(Icons.bus_alert, color: Colors.black),
                 onPressed: () {}),
           ),
         ),

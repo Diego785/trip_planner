@@ -24,9 +24,9 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
 
 // PETICIÓN GET DE DATOS DEL MODELO A LA API
   Future<Null> _getLineas() async {
-    // Uri url = Uri.parse('http://10.0.2.2/trip_planner_bd/public/api/linea');
-    final urlPrincipal = ServerProvider().url;
-    Uri url = Uri.parse('$urlPrincipal/api/linea');
+     Uri url = Uri.parse('http://10.0.2.2/trip_planner_bd/public/api/linea');
+    //final urlPrincipal = ServerProvider().url;
+    ///Uri url = Uri.parse('$urlPrincipal/api/linea');
     final response = await http.get(url);
     List<Linea> data = [];
     if (response.statusCode == 200) {
@@ -139,7 +139,7 @@ final leftEditIcon = Container(
                               backgroundColor: Colors.green[800],
                               onPressed: () => {},
                               child:  const Icon(
-                                Icons.person_pin,
+                                Icons.place,
                                 color: Colors.white,
                               ),
                             ),
@@ -245,9 +245,9 @@ final leftEditIcon = Container(
                                               DismissDirection.startToEnd) {
                                             showModalBottomSheet(
                                                 backgroundColor:
-                                                    Colors.transparent,
+                                                    Colors.transparent.withOpacity(0.1),
                                                 barrierColor: Colors.transparent
-                                                    .withOpacity(0.2),
+                                                    .withOpacity(0.9),
                                                 context: context,
                                                 builder: (_) {
                                                   return Container(
@@ -322,9 +322,9 @@ final leftEditIcon = Container(
                                           } else {
                                             showModalBottomSheet(
                                                 backgroundColor:
-                                                    Colors.transparent,
+                                                    Colors.transparent.withOpacity(0.1),
                                                 barrierColor: Colors.transparent
-                                                    .withOpacity(0.2),
+                                                    .withOpacity(0.9),
                                                 context: context,
                                                 builder: (_) {
                                                   return Container(
@@ -407,7 +407,7 @@ final leftEditIcon = Container(
                                                                 _listLineasGet[
                                                                         index]
                                                                     .id,
-                                                                style: const TextStyle(
+                                                                style: TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -417,7 +417,7 @@ final leftEditIcon = Container(
                                                                         FontWeight
                                                                             .bold,
                                                                     color: Colors
-                                                                        .black),
+                                                                        .green.shade500),
                                                               ),
                                                             ],
                                                           ),
@@ -445,7 +445,7 @@ final leftEditIcon = Container(
                                                                 _listLineasGet[
                                                                         index]
                                                                     .code,
-                                                                style: const TextStyle(
+                                                                style: TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -455,7 +455,7 @@ final leftEditIcon = Container(
                                                                         FontWeight
                                                                             .bold,
                                                                     color: Colors
-                                                                        .black),
+                                                                        .green.shade500),
                                                               ),
                                                             ],
                                                           ),
@@ -483,7 +483,7 @@ final leftEditIcon = Container(
                                                                 _listLineasGet[
                                                                         index]
                                                                     .direccion,
-                                                                style: const TextStyle(
+                                                                style: TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -493,7 +493,7 @@ final leftEditIcon = Container(
                                                                         FontWeight
                                                                             .bold,
                                                                     color: Colors
-                                                                        .black),
+                                                                        .green.shade500),
                                                               ),
                                                             ],
                                                           ),
@@ -521,7 +521,7 @@ final leftEditIcon = Container(
                                                                 _listLineasGet[
                                                                         index]
                                                                     .telefono,
-                                                                style: const TextStyle(
+                                                                style: TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -531,7 +531,7 @@ final leftEditIcon = Container(
                                                                         FontWeight
                                                                             .bold,
                                                                     color: Colors
-                                                                        .black),
+                                                                        .green.shade500),
                                                               ),
                                                             ],
                                                           ),
@@ -559,7 +559,7 @@ final leftEditIcon = Container(
                                                                 _listLineasGet[
                                                                         index]
                                                                     .email,
-                                                                style: const TextStyle(
+                                                                style: TextStyle(
                                                                     fontStyle:
                                                                         FontStyle
                                                                             .italic,
@@ -569,7 +569,7 @@ final leftEditIcon = Container(
                                                                         FontWeight
                                                                             .bold,
                                                                     color: Colors
-                                                                        .black),
+                                                                        .green.shade500),
                                                               ),
                                                             ],
                                                           ),
@@ -598,7 +598,7 @@ final leftEditIcon = Container(
                                                                   _listLineasGet[
                                                                           index]
                                                                       .descripcion,
-                                                                  style: const TextStyle(
+                                                                  style: TextStyle(
                                                                       fontStyle:
                                                                           FontStyle
                                                                               .italic,
@@ -608,7 +608,7 @@ final leftEditIcon = Container(
                                                                           FontWeight
                                                                               .bold,
                                                                       color: Colors
-                                                                          .black),
+                                                                          .green.shade500),
                                                                   maxLines: 2,
                                                                 ),
                                                               ),
