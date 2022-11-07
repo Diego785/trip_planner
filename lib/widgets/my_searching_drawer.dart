@@ -158,7 +158,7 @@ final leftEditIcon = Container(
                               ),
                             ),
                             const SizedBox(height: 5,),
-                                Text("1ra. Funcionalidad", style: TextStyle(color: Colors.green[900], fontSize: 13),),
+                                Text("3ra. Funcionalidad", style: TextStyle(color: Colors.green[900], fontSize: 13),),
                           ],
                         ),
                       ],
