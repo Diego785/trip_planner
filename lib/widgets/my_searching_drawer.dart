@@ -6,7 +6,9 @@ import 'package:trip_planner/complements/loading_page.dart';
 import 'package:trip_planner/models/linea.dart';
 import 'package:trip_planner/models/lineas.dart';
 import 'package:http/http.dart' as http;
+import 'package:trip_planner/screens/screens.dart';
 import 'package:trip_planner/widgets/my_button.dart';
+import 'package:trip_planner/providers/providers.dart';
 
 class MySearchingDrawer extends StatefulWidget {
   @override
@@ -22,7 +24,9 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
 
 // PETICIÓN GET DE DATOS DEL MODELO A LA API
   Future<Null> _getLineas() async {
-    Uri url = Uri.parse('http://10.0.2.2/trip_planner_bd/public/api/linea');
+    // Uri url = Uri.parse('http://10.0.2.2/trip_planner_bd/public/api/linea');
+    final urlPrincipal = ServerProvider().url;
+    Uri url = Uri.parse('$urlPrincipal/api/linea');
     final response = await http.get(url);
     List<Linea> data = [];
     if (response.statusCode == 200) {
@@ -281,10 +285,12 @@ final leftEditIcon = Container(
                                                                 .green.shade900,
                                                             onTap: () {
                                                               //AQUÍ COLOCAR LA POLYLINE DE LA IDA
-                                                              print("Id del micro: " +
-                                                                  _listLineasGet[
-                                                                          index]
-                                                                      .id);
+                                                              Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder: (context) => MapPolylinesScreen(
+                                                                            int.parse(_listLineasGet[index].id),
+                                                                            1)));
                                                             },
                                                           ),
 
@@ -298,10 +304,13 @@ final leftEditIcon = Container(
                                                                 .green.shade900,
                                                             onTap: () {
                                                               //AQUÍ COLOCAR LA POLYLINE DE LA VUELTA
-                                                              print("Id del micro: " +
-                                                                  _listLineasGet[
-                                                                          index]
-                                                                      .id);
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) => MapPolylinesScreen(
+                                                                          int.parse(
+                                                                              _listLineasGet[index].id),
+                                                                          2)));
                                                             },
                                                           ),
                                                         ],

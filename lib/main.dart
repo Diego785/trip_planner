@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:trip_planner/blocs/blocs.dart';
 import 'package:trip_planner/pages/recorrido_lineas.dart';
+import 'package:trip_planner/providers/providers.dart';
 import 'package:trip_planner/screens/loading_screen.dart';
 
 void main() {
@@ -19,16 +21,21 @@ void main() {
 class MainClass extends StatelessWidget {
   const MainClass({super.key});
 
-    @override
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Trip Planner Project',
-      debugShowCheckedModeBanner: false,
-      initialRoute: 'home',
-      routes: {
-        'home': (_) => LoadingScreen(),
-        'recorrido_lineas': (_) => RecorridoLineas()
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => PuntosProvider())
+      ],
+      child: MaterialApp(
+        title: 'Trip Planner Project',
+        debugShowCheckedModeBanner: false,
+        initialRoute: 'home',
+        routes: {
+          'home': (_) => LoadingScreen(),
+          'recorrido_lineas': (_) => RecorridoLineas()
+        },
+      ),
     );
   }
 }
