@@ -1,0 +1,1 @@
+export 'package:trip_planner/helpers/Lista.dart';
