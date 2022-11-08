@@ -8,7 +8,9 @@ import 'package:trip_planner/widgets/my_searching_drawer.dart';
 import 'package:trip_planner/widgets/widgets.dart';
 
 class RecorridoLineas extends StatefulWidget {
-  const RecorridoLineas({super.key});
+  final int recorrido;
+  final int par;
+  const RecorridoLineas(this.recorrido, this.par, {super.key});
 
   @override
   State<RecorridoLineas> createState() => _RecorridoLineasState();
@@ -17,12 +19,21 @@ class RecorridoLineas extends StatefulWidget {
 class _RecorridoLineasState extends State<RecorridoLineas> {
   late LocationBloc locationBloc;
 
+  var recorridos = 0;
+  var pares = 0;
+
   @override
   void initState() {
+    int recorrido = widget.recorrido;
+    int parImpar = widget.par;
     super.initState();
     locationBloc = BlocProvider.of<LocationBloc>(context);
     // locationBloc.getCurrentPosition();
     locationBloc.startFollowingUser();
+    setState(() {
+      recorridos = recorrido;
+      pares = parImpar;
+    });
   }
 
   @override
@@ -44,7 +55,8 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
           return SingleChildScrollView(
             child: Stack(
               children: [
-                MapView(initialLocation: state.lastKnownLocation!),
+                MapView(recorridos, pares,
+                    initialLocation: state.lastKnownLocation!),
                 //buttom para atras
                 /*Positioned(
                   left: 15,
@@ -65,18 +77,18 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
                 //BUSCADOR
                 //const SearchBar(),
                 Positioned(
-                left: MediaQuery.of(context).size.width-68,
-                top: MediaQuery.of(context).size.height-318,
+                    left: MediaQuery.of(context).size.width - 68,
+                    top: MediaQuery.of(context).size.height - 318,
                     child: SizedBox(
-                    height: 50,
-                    width: 50,
+                      height: 50,
+                      width: 50,
                       child: FloatingActionButton(
-                  backgroundColor: Colors.green[800],
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                  child: const Icon(
-                      Icons.search,
-                  ),
-                ),
+                        backgroundColor: Colors.green[800],
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                        child: const Icon(
+                          Icons.search,
+                        ),
+                      ),
                     )),
               ],
             ),

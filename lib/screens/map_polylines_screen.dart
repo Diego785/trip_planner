@@ -185,7 +185,7 @@ class _MapPolylinesScreenState extends State<MapPolylinesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (this._polyline.isEmpty) return const LoadingPage();
+    if (_polyline.isEmpty) return const LoadingPage();
 
     return Scaffold(body: Center(
         child: Consumer<PuntosProvider>(builder: (context, value, child) {
