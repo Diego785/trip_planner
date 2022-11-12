@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:trip_planner/blocs/blocs.dart';
 import 'package:trip_planner/complements/loading_page.dart';
+import 'package:trip_planner/complements/loading_page2.dart';
 import 'package:trip_planner/helpers/helpers.dart';
 import 'package:trip_planner/models/models.dart';
 import 'package:trip_planner/providers/providers.dart';
@@ -212,23 +213,22 @@ class _MapViewState extends State<MapView> {
         width: size.width,
         height: size.height,
         child: Center(
-          child: Consumer<PuntosProvider>(builder: (context, value, child) {
-            if (value.punto == null) {
-              return const CircularProgressIndicator();
-            }
-            return GoogleMap(
-              initialCameraPosition: _kGooglePlex,
-              markers: _markers,
-              compassEnabled: false,
-              myLocationEnabled: true,
-              zoomControlsEnabled: false,
-              myLocationButtonEnabled: false,
-              onMapCreated: (controller) =>
-                  mapBloc.add(OnMapInitialzedEvent(controller)),
-              polylines: _polyline,
-            );
-          })
-        ),
+            child: Consumer<PuntosProvider>(builder: (context, value, child) {
+          if (value.punto == null) {
+            return const LoadingPage2();
+          }
+          return GoogleMap(
+            initialCameraPosition: _kGooglePlex,
+            markers: _markers,
+            compassEnabled: false,
+            myLocationEnabled: true,
+            zoomControlsEnabled: false,
+            myLocationButtonEnabled: false,
+            onMapCreated: (controller) =>
+                mapBloc.add(OnMapInitialzedEvent(controller)),
+            polylines: _polyline,
+          );
+        })),
       );
     }
   }
