@@ -89,7 +89,7 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
                 //const SearchBar(),
                 Positioned(
                     left: MediaQuery.of(context).size.width - 68,
-                    top: MediaQuery.of(context).size.height - 318,
+                    top: MediaQuery.of(context).size.height - 195,
                     child: SizedBox(
                       height: 50,
                       width: 50,
@@ -110,7 +110,7 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
-        children: const [BtnCurrentLocation(), Btnprincipales()],
+        children: const [Btnprincipales(), BtnCurrentLocation()],
       ),
     );
   }

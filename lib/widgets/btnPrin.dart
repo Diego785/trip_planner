@@ -17,12 +17,12 @@ class Btnprincipales extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(bottom: 10),
           child: CircleAvatar(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.green[800],
             maxRadius: 25,
             child: IconButton(
                 icon: const Icon(
                   Icons.place,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -35,38 +35,38 @@ class Btnprincipales extends StatelessWidget {
                 }),
           ),
         ),
-        Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          child: CircleAvatar(
-            backgroundColor: Colors.white,
-            maxRadius: 25,
-            child: IconButton(
-                icon: const Icon(Icons.bus_alert, color: Colors.black),
-                onPressed: () {}),
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          child: CircleAvatar(
-            backgroundColor: Colors.white,
-            maxRadius: 25,
-            child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RecorridoLineas(
-                          0,
-                          0,
-                          null, 
-                          null
-                      )
-                    )
-                  );
-                }),
-          ),
-        ),
+        // Container(
+        //   margin: const EdgeInsets.only(bottom: 10),
+        //   child: CircleAvatar(
+        //     backgroundColor: Colors.white,
+        //     maxRadius: 25,
+        //     child: IconButton(
+        //         icon: const Icon(Icons.bus_alert, color: Colors.black),
+        //         onPressed: () {}),
+        //   ),
+        // ),
+        // Container(
+        //   margin: const EdgeInsets.only(bottom: 10),
+        //   child: CircleAvatar(
+        //     backgroundColor: Colors.green[800],
+        //     maxRadius: 25,
+        //     child: IconButton(
+        //         icon: const Icon(Icons.arrow_back, color: Colors.white),
+        //         onPressed: () {
+        //           Navigator.push(
+        //             context,
+        //             MaterialPageRoute(
+        //               builder: (context) => const RecorridoLineas(
+        //                   0,
+        //                   0,
+        //                   null, 
+        //                   null
+        //               )
+        //             )
+        //           );
+        //         }),
+        //   ),
+        // ),
       ],
     );
   }
