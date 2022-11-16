@@ -291,7 +291,7 @@ final leftEditIcon = Container(
                                                                     MaterialPageRoute(
                                                                         builder: (context) => RecorridoLineas(
                                                                             int.parse(_listLineasGet[index].id),
-                                                                            1)));
+                                                                            1, null, null)));
                                                             },
                                                           ),
 
@@ -311,7 +311,7 @@ final leftEditIcon = Container(
                                                                       builder: (context) => RecorridoLineas(
                                                                           int.parse(
                                                                               _listLineasGet[index].id),
-                                                                          2)));
+                                                                          2, null, null)));
                                                             },
                                                           ),
                                                         ],

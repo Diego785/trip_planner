@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:trip_planner/pages/recorrido_lineas.dart';
+import 'package:trip_planner/screens/screens.dart';
 
 class Btnprincipales extends StatelessWidget {
   //VoidCallback? onOk;
@@ -22,7 +24,15 @@ class Btnprincipales extends StatelessWidget {
                   Icons.place,
                   color: Colors.black,
                 ),
-                onPressed: () {}),
+                onPressed: () {
+                  Navigator.push(
+                    context, 
+                    MaterialPageRoute(
+                      builder: (context)=>SearchScreen(),
+                      fullscreenDialog: true,
+                    ),
+                  );
+                }),
           ),
         ),
         Container(
@@ -41,8 +51,20 @@ class Btnprincipales extends StatelessWidget {
             backgroundColor: Colors.white,
             maxRadius: 25,
             child: IconButton(
-                icon: const Icon(Icons.mode_of_travel, color: Colors.black),
-                onPressed: () {}),
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RecorridoLineas(
+                          0,
+                          0,
+                          null, 
+                          null
+                      )
+                    )
+                  );
+                }),
           ),
         ),
       ],

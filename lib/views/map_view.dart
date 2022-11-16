@@ -14,13 +14,16 @@ import 'package:trip_planner/models/models.dart';
 import 'package:trip_planner/providers/providers.dart';
 import 'package:trip_planner/services/services.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:google_place/google_place.dart';
 
 class MapView extends StatefulWidget {
   final int recorrido;
   final int par;
+  final DetailsResult? startPosition;
+  final DetailsResult? endPosition;
   //para la ultima localizacion del usuario
   final LatLng initialLocation;
-  const MapView(this.recorrido, this.par,
+  const MapView(this.recorrido, this.par, this.startPosition, this.endPosition,
       {super.key, required this.initialLocation});
 
   @override
@@ -33,10 +36,8 @@ class _MapViewState extends State<MapView> {
 
   final CameraPosition _kGooglePlex = const CameraPosition(
     target: LatLng(-17.782158, -63.180684),
-    zoom: 13,
+    zoom: 12,
   );
-
-  Uint8List? markerImage;
 
   String? direccion;
   String? direccion2;
@@ -56,13 +57,18 @@ class _MapViewState extends State<MapView> {
   final Set<Polyline> _polyline = {};
   List<LatLng> latlng = [];
   var recorridos = 0;
+  var origens = null;
 
   @override
   void initState() {
     int recorrido = widget.recorrido;
     int parImpar = widget.par;
+    DetailsResult? origen = widget.startPosition;
+    DetailsResult? destino = widget.endPosition;
+
     super.initState();
     if (recorrido != 0) {
+      //Lineas
       PuntosService.getPuntos(recorrido, parImpar).then((puntos) {
         setState(() {
           _puntos = puntos;
@@ -75,6 +81,7 @@ class _MapViewState extends State<MapView> {
     }
     setState(() {
       recorridos = recorrido;
+      origens = origen;
     });
   }
 
@@ -194,21 +201,8 @@ class _MapViewState extends State<MapView> {
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final size = MediaQuery.of(context).size;
-    if (recorridos == 0) {
-      return SizedBox(
-        width: size.width,
-        height: size.height,
-        child: GoogleMap(
-          initialCameraPosition: _kGooglePlex,
-          compassEnabled: false,
-          myLocationEnabled: true,
-          zoomControlsEnabled: false,
-          myLocationButtonEnabled: false,
-          onMapCreated: (controller) =>
-              mapBloc.add(OnMapInitialzedEvent(controller)),
-        ),
-      );
-    } else {
+    if (recorridos != 0) {
+      //Lineas
       return SizedBox(
         width: size.width,
         height: size.height,
@@ -229,6 +223,68 @@ class _MapViewState extends State<MapView> {
             polylines: _polyline,
           );
         })),
+      );
+    } else if (origens != null) {
+      Set<Marker> _markers = {
+        Marker(
+            markerId: MarkerId('start'),
+            position: LatLng(widget.startPosition!.geometry!.location!.lat!,
+                widget.startPosition!.geometry!.location!.lng!),
+            infoWindow: const InfoWindow(
+              title: 'Origen',
+            ),
+            draggable: true,
+            onDragEnd: (newPosition1) {
+              // posicion1 = newPosition1;
+              print('Primero');
+              print(newPosition1.latitude.toString() +
+                  newPosition1.longitude.toString());
+            }),
+        Marker(
+          markerId: MarkerId('end'),
+          position: LatLng(widget.endPosition!.geometry!.location!.lat!,
+              widget.endPosition!.geometry!.location!.lng!),
+          infoWindow: const InfoWindow(
+            title: 'Destino',
+          ),
+          draggable: true,
+          onDragEnd: (newPosition2) {
+            // posicion2 = newPosition2;
+            print('Segundo');
+            print(newPosition2.latitude.toString() +
+                newPosition2.longitude.toString());
+          },
+        ),
+      };
+      //Buscador HACERRRR
+      return SizedBox(
+        width: size.width,
+        height: size.height,
+        child: GoogleMap(
+          initialCameraPosition: _kGooglePlex,
+          markers: Set.from(_markers),
+          compassEnabled: false,
+          myLocationEnabled: true,
+          zoomControlsEnabled: false,
+          myLocationButtonEnabled: false,
+          onMapCreated: (controller) =>
+              mapBloc.add(OnMapInitialzedEvent(controller)),
+        ),
+      );
+    } else {
+      //Normal
+      return SizedBox(
+        width: size.width,
+        height: size.height,
+        child: GoogleMap(
+          initialCameraPosition: _kGooglePlex,
+          compassEnabled: false,
+          myLocationEnabled: true,
+          zoomControlsEnabled: false,
+          myLocationButtonEnabled: false,
+          onMapCreated: (controller) =>
+              mapBloc.add(OnMapInitialzedEvent(controller)),
+        ),
       );
     }
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_place/google_place.dart';
 import 'package:trip_planner/blocs/blocs.dart';
 import 'package:trip_planner/views/map_view.dart';
 import 'package:trip_planner/widgets/my_float_action_button.dart';
@@ -10,7 +11,11 @@ import 'package:trip_planner/widgets/widgets.dart';
 class RecorridoLineas extends StatefulWidget {
   final int recorrido;
   final int par;
-  const RecorridoLineas(this.recorrido, this.par, {super.key});
+  final DetailsResult? startPosition;
+  final DetailsResult? endPosition;
+  const RecorridoLineas(
+      this.recorrido, this.par, this.startPosition, this.endPosition,
+      {super.key});
 
   @override
   State<RecorridoLineas> createState() => _RecorridoLineasState();
@@ -21,11 +26,15 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
 
   var recorridos = 0;
   var pares = 0;
+  var origen = null;
+  var destino = null;
 
   @override
   void initState() {
     int recorrido = widget.recorrido;
     int parImpar = widget.par;
+    DetailsResult? startPosition = widget.startPosition;
+    DetailsResult? endPosition = widget.endPosition;
     super.initState();
     locationBloc = BlocProvider.of<LocationBloc>(context);
     // locationBloc.getCurrentPosition();
@@ -33,6 +42,8 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
     setState(() {
       recorridos = recorrido;
       pares = parImpar;
+      origen = startPosition;
+      destino = endPosition;
     });
   }
 
@@ -55,7 +66,7 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
           return SingleChildScrollView(
             child: Stack(
               children: [
-                MapView(recorridos, pares,
+                MapView(recorridos, pares, origen, destino, 
                     initialLocation: state.lastKnownLocation!),
                 //buttom para atras
                 /*Positioned(
