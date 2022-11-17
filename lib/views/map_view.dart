@@ -54,6 +54,7 @@ class _MapViewState extends State<MapView> {
   }
 
   final Set<Marker> _markers = {};
+  final Set<Marker> _markers2 = {};
   final Set<Polyline> _polyline = {};
   List<LatLng> latlng = [];
   var recorridos = 0;
@@ -79,10 +80,51 @@ class _MapViewState extends State<MapView> {
       Provider.of<PuntosProvider>(context, listen: false)
           .setPunto(recorrido, parImpar);
     }
+    if(origen != null ){
+      setState(() {
+        loadData2();
+      });
+    }
     setState(() {
       recorridos = recorrido;
       origens = origen;
     });
+  }
+
+  loadData2() async{
+    final Uint8List markerIcon = await getBytesFromAssets(images, 100);
+
+    _markers2.add(Marker(
+      markerId: const MarkerId('start'),
+      position: LatLng(widget.startPosition!.geometry!.location!.lat!,
+                widget.startPosition!.geometry!.location!.lng!),
+      infoWindow: const InfoWindow(
+        title: 'Origen',
+      ),
+      draggable: true,
+      onDragEnd: (newPosition1) {
+        // posicion1 = newPosition1;
+        print('Primero');
+        print(newPosition1.latitude.toString() +
+            newPosition1.longitude.toString());
+      }
+    ));
+    _markers2.add(Marker(
+      markerId: const MarkerId('end'),
+      position: LatLng(widget.endPosition!.geometry!.location!.lat!,
+          widget.endPosition!.geometry!.location!.lng!),
+      infoWindow: const InfoWindow(
+        title: 'Destino',
+      ),
+      icon: BitmapDescriptor.fromBytes(markerIcon),
+      draggable: true,
+      onDragEnd: (newPosition2) {
+        // posicion1 = newPosition1;
+        print('Segundo');
+        print(newPosition2.latitude.toString() +
+            newPosition2.longitude.toString());
+      }
+    ));
   }
 
   loadData() async {
@@ -225,44 +267,44 @@ class _MapViewState extends State<MapView> {
         })),
       );
     } else if (origens != null) {
-      Set<Marker> _markers = {
-        Marker(
-            markerId: MarkerId('start'),
-            position: LatLng(widget.startPosition!.geometry!.location!.lat!,
-                widget.startPosition!.geometry!.location!.lng!),
-            infoWindow: const InfoWindow(
-              title: 'Origen',
-            ),
-            draggable: true,
-            onDragEnd: (newPosition1) {
-              // posicion1 = newPosition1;
-              print('Primero');
-              print(newPosition1.latitude.toString() +
-                  newPosition1.longitude.toString());
-            }),
-        Marker(
-          markerId: MarkerId('end'),
-          position: LatLng(widget.endPosition!.geometry!.location!.lat!,
-              widget.endPosition!.geometry!.location!.lng!),
-          infoWindow: const InfoWindow(
-            title: 'Destino',
-          ),
-          draggable: true,
-          onDragEnd: (newPosition2) {
-            // posicion2 = newPosition2;
-            print('Segundo');
-            print(newPosition2.latitude.toString() +
-                newPosition2.longitude.toString());
-          },
-        ),
-      };
-      //Buscador HACERRRR
+      // Set<Marker> _markers = {
+      //   Marker(
+      //       markerId: MarkerId('start'),
+      //       position: LatLng(widget.startPosition!.geometry!.location!.lat!,
+      //           widget.startPosition!.geometry!.location!.lng!),
+      //       infoWindow: const InfoWindow(
+      //         title: 'Origen',
+      //       ),
+      //       draggable: true,
+      //       onDragEnd: (newPosition1) {
+      //         // posicion1 = newPosition1;
+      //         print('Primero');
+      //         print(newPosition1.latitude.toString() +
+      //             newPosition1.longitude.toString());
+      //       }),
+      //   Marker(
+      //     markerId: MarkerId('end'),
+      //     position: LatLng(widget.endPosition!.geometry!.location!.lat!,
+      //         widget.endPosition!.geometry!.location!.lng!),
+      //     infoWindow: const InfoWindow(
+      //       title: 'Destino',
+      //     ),
+      //     draggable: true,
+      //     onDragEnd: (newPosition2) {
+      //       // posicion2 = newPosition2;
+      //       print('Segundo');
+      //       print(newPosition2.latitude.toString() +
+      //           newPosition2.longitude.toString());
+      //     },
+      //   ),
+      // };
+      //Buscador
       return SizedBox(
         width: size.width,
         height: size.height,
         child: GoogleMap(
           initialCameraPosition: _kGooglePlex,
-          markers: Set.from(_markers),
+          markers: _markers2,
           compassEnabled: false,
           myLocationEnabled: true,
           zoomControlsEnabled: false,
