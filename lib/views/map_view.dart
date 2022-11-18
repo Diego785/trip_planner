@@ -41,7 +41,7 @@ class _MapViewState extends State<MapView> {
 
   String? direccion;
   String? direccion2;
-  String images = 'assets/bandera-roja.png';
+  String images = 'assets/destino bandera.png';
 
   Future<Uint8List> getBytesFromAssets(String path, int width) async {
     ByteData data = await rootBundle.load(path);
@@ -92,7 +92,7 @@ class _MapViewState extends State<MapView> {
   }
 
   loadData2() async{
-    final Uint8List markerIcon = await getBytesFromAssets(images, 100);
+    final Uint8List markerIcon = await getBytesFromAssets(images, 125);
 
     _markers2.add(Marker(
       markerId: const MarkerId('start'),
@@ -207,7 +207,7 @@ class _MapViewState extends State<MapView> {
         await placemarkFromCoordinates(latlng[l].latitude, latlng[l].longitude);
     direccion2 = placemarks2.reversed.last.thoroughfare.toString();
 
-    final Uint8List markerIcon = await getBytesFromAssets(images, 100);
+    final Uint8List markerIcon = await getBytesFromAssets(images, 125);
 
     _markers.add(Marker(
       markerId: MarkerId(0.toString()),
