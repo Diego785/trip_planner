@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:trip_planner/blocs/blocs.dart';
+import 'package:trip_planner/implementation_cards/ui/contact_list_page.dart';
 import 'package:trip_planner/pages/recorrido_lineas.dart';
 import 'package:trip_planner/providers/providers.dart';
 import 'package:trip_planner/screens/loading_screen.dart';
@@ -33,6 +34,7 @@ class MainClass extends StatelessWidget {
         initialRoute: 'home',
         routes: {
           'home': (_) => const LoadingScreen(),
+          'recommendation': (_) => const ContactListPage(),
           // 'recorrido_lineas': (_) => RecorridoLineas()
         },
       ),

@@ -302,16 +302,60 @@ class _MapViewState extends State<MapView> {
       return SizedBox(
         width: size.width,
         height: size.height,
-        child: GoogleMap(
-          initialCameraPosition: _kGooglePlex,
-          markers: _markers2,
-          compassEnabled: false,
-          myLocationEnabled: true,
-          zoomControlsEnabled: false,
-          myLocationButtonEnabled: false,
-          onMapCreated: (controller) =>
-              mapBloc.add(OnMapInitialzedEvent(controller)),
+        child: Stack(
+          children: [
+            GoogleMap(
+              initialCameraPosition: _kGooglePlex,
+              markers: _markers2,
+              compassEnabled: false,
+              myLocationEnabled: true,
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: false,
+              onMapCreated: (controller) =>
+                  mapBloc.add(OnMapInitialzedEvent(controller)),
+            ),
+            Container(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                margin: EdgeInsets.only(top: 500, right: 100, left: 100),
+                decoration: BoxDecoration(
+                  color: Colors.green[900],
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  title: const Text(
+                    "Ver Sugerencias",
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontStyle: FontStyle.italic),
+                  ),
+                  trailing: Icon(
+                    Icons.visibility,
+                    color: Colors.white,
+                  ),
+                  onTap: () {
+                    
+                    Navigator.pushNamed(context, 'recommendation');
+                    
+                  },
+                ),
+              ),
+          ],
         ),
+        
       );
     } else {
       //Normal
