@@ -10,6 +10,7 @@ import 'package:trip_planner/blocs/blocs.dart';
 import 'package:trip_planner/complements/loading_page.dart';
 import 'package:trip_planner/complements/loading_page2.dart';
 import 'package:trip_planner/helpers/helpers.dart';
+import 'package:trip_planner/implementation_cards/ui/contact_list_page.dart';
 import 'package:trip_planner/models/models.dart';
 import 'package:trip_planner/providers/providers.dart';
 import 'package:trip_planner/services/services.dart';
@@ -260,15 +261,61 @@ class _MapViewState extends State<MapView> {
       return SizedBox(
         width: size.width,
         height: size.height,
-        child: GoogleMap(
-          initialCameraPosition: _kGooglePlex,
-          markers: Set.from(_markers),
-          compassEnabled: false,
-          myLocationEnabled: true,
-          zoomControlsEnabled: false,
-          myLocationButtonEnabled: false,
-          onMapCreated: (controller) =>
-              mapBloc.add(OnMapInitialzedEvent(controller)),
+        child: Stack(
+          children: [
+            GoogleMap(
+              initialCameraPosition: _kGooglePlex,
+              markers: Set.from(_markers),
+              compassEnabled: false,
+              myLocationEnabled: true,
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: false,
+              onMapCreated: (controller) =>
+                  mapBloc.add(OnMapInitialzedEvent(controller)),
+            ),
+            Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                margin: EdgeInsets.only(top: 400, right: 90, left: 90),
+                decoration: BoxDecoration(
+                  color: Colors.green[500],
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  title: Text(
+                    "Ver sugerencias",
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontStyle: FontStyle.italic),
+                  ),
+                  trailing: Icon(
+                    Icons.visibility,
+                    color: Colors.green[900],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ContactListPage()));
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       );
     } else {
