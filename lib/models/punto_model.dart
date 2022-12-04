@@ -15,6 +15,7 @@ class PuntosModel {
         required this.lati,
         required this.recorridosId,
         required this.lineaId,
+        required this.color,
     });
 
     int id;
@@ -22,6 +23,7 @@ class PuntosModel {
     String lati; 
     int recorridosId;
     int lineaId;
+    String color;
 
     factory PuntosModel.fromJson(Map<String, dynamic> json) => PuntosModel(
         id: json["id"],
@@ -29,6 +31,7 @@ class PuntosModel {
         lati: json["lati"],
         recorridosId: json["recorridos_id"],
         lineaId: json["linea_id"],
+        color: json["color"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -37,5 +40,6 @@ class PuntosModel {
         "lati": lati,
         "recorridos_id": recorridosId,
         "linea_id": lineaId,
+        "color": color,
     };
 }

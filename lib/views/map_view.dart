@@ -80,7 +80,7 @@ class _MapViewState extends State<MapView> {
       Provider.of<PuntosProvider>(context, listen: false)
           .setPunto(recorrido, parImpar);
     }
-    if(origen != null ){
+    if (origen != null) {
       setState(() {
         loadData2();
       });
@@ -91,43 +91,80 @@ class _MapViewState extends State<MapView> {
     });
   }
 
-  loadData2() async{
+  loadData2() async {
     final Uint8List markerIcon = await getBytesFromAssets(images, 125);
 
     _markers2.add(Marker(
-      markerId: const MarkerId('start'),
-      position: LatLng(widget.startPosition!.geometry!.location!.lat!,
-                widget.startPosition!.geometry!.location!.lng!),
-      infoWindow: const InfoWindow(
-        title: 'Origen',
-      ),
-      draggable: true,
-      onDragEnd: (newPosition1) {
-        // posicion1 = newPosition1;
-        print('Primero');
-        print(newPosition1.latitude.toString() +
-            newPosition1.longitude.toString());
-      }
-    ));
+        markerId: const MarkerId('start'),
+        position: LatLng(widget.startPosition!.geometry!.location!.lat!,
+            widget.startPosition!.geometry!.location!.lng!),
+        infoWindow: const InfoWindow(
+          title: 'Origen',
+        ),
+        draggable: true,
+        onDragEnd: (newPosition1) {
+          // posicion1 = newPosition1;
+          print('Primero');
+          print(newPosition1.latitude.toString() +
+              newPosition1.longitude.toString());
+        }));
     _markers2.add(Marker(
-      markerId: const MarkerId('end'),
-      position: LatLng(widget.endPosition!.geometry!.location!.lat!,
-          widget.endPosition!.geometry!.location!.lng!),
-      infoWindow: const InfoWindow(
-        title: 'Destino',
-      ),
-      icon: BitmapDescriptor.fromBytes(markerIcon),
-      draggable: true,
-      onDragEnd: (newPosition2) {
-        // posicion1 = newPosition1;
-        print('Segundo');
-        print(newPosition2.latitude.toString() +
-            newPosition2.longitude.toString());
-      }
-    ));
+        markerId: const MarkerId('end'),
+        position: LatLng(widget.endPosition!.geometry!.location!.lat!,
+            widget.endPosition!.geometry!.location!.lng!),
+        infoWindow: const InfoWindow(
+          title: 'Destino',
+        ),
+        icon: BitmapDescriptor.fromBytes(markerIcon),
+        draggable: true,
+        onDragEnd: (newPosition2) {
+          // posicion1 = newPosition1;
+          print('Segundo');
+          print(newPosition2.latitude.toString() +
+              newPosition2.longitude.toString());
+        }));
   }
 
   loadData() async {
+    var color = _puntos[0].color;
+    Color colores = Colors.green;
+    switch (color) {
+      case 'Blanco':
+        {
+          colores = Colors.white;
+        }
+        break;
+
+      case 'Rojo':
+        {
+          colores = Colors.red;
+        }
+        break;
+
+      case 'Azul':
+        {
+          colores = Colors.blue;
+        }
+        break;
+      
+      case 'Green':
+        {
+          colores = Colors.green;
+        }
+        break;
+
+      case 'Celeste':
+        {
+          colores = Colors.lightBlue;
+        }
+        break;
+
+      case 'Castano':
+        {
+          colores = Colors.orange[900]!;
+        }
+        break;
+    }
     int lineaMicro = _puntos[0].lineaId;
     switch (lineaMicro) {
       case 1:
@@ -191,10 +228,8 @@ class _MapViewState extends State<MapView> {
         break;
     }
 
-    var color = Colors.green;
     var camino = 'Ida';
     if (_puntos[0].recorridosId % 2 == 0) {
-      color = Colors.red;
       camino = 'Vuelta';
     }
 
@@ -223,7 +258,7 @@ class _MapViewState extends State<MapView> {
       _polyline.add(Polyline(
           polylineId: PolylineId('1'),
           points: latlng,
-          color: color,
+          color: colores,
           width: 7,
           startCap: Cap.roundCap,
           endCap: Cap.roundCap));
@@ -315,47 +350,44 @@ class _MapViewState extends State<MapView> {
                   mapBloc.add(OnMapInitialzedEvent(controller)),
             ),
             Container(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                margin: EdgeInsets.only(top: 500, right: 100, left: 100),
-                decoration: BoxDecoration(
-                  color: Colors.green[900],
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
+              padding: EdgeInsets.symmetric(vertical: 10),
+              margin: EdgeInsets.only(top: 500, right: 100, left: 100),
+              decoration: BoxDecoration(
+                color: Colors.green[900],
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
                 ),
-                child: ListTile(
-                  title: const Text(
-                    "Ver Sugerencias",
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontStyle: FontStyle.italic),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
                   ),
-                  trailing: Icon(
-                    Icons.visibility,
-                    color: Colors.white,
-                  ),
-                  onTap: () {
-                    
-                    Navigator.pushNamed(context, 'recommendation');
-                    
-                  },
-                ),
+                ],
               ),
+              child: ListTile(
+                title: const Text(
+                  "Ver Sugerencias",
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic),
+                ),
+                trailing: Icon(
+                  Icons.visibility,
+                  color: Colors.white,
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, 'recommendation');
+                },
+              ),
+            ),
           ],
         ),
-        
       );
     } else {
       //Normal
