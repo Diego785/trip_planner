@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:trip_planner/complements/loading_page.dart';
@@ -26,9 +25,9 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
 
 // PETICIÓN GET DE DATOS DEL MODELO A LA API
   Future<Null> _getLineas() async {
-    // Uri url = Uri.parse('http://10.0.2.2/trip_planner_bd/public/api/linea');
-    final urlPrincipal = ServerProvider().url;
-    Uri url = Uri.parse('$urlPrincipal/api/linea');
+     Uri url = Uri.parse('http://10.0.2.2/trip_planner_bd/public/api/linea');
+    //final urlPrincipal = ServerProvider().url;
+    //Uri url = Uri.parse('$urlPrincipal/api/linea');
     final response = await http.get(url);
     List<Linea> data = [];
     if (response.statusCode == 200) {
