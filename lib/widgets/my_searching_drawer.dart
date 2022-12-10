@@ -18,6 +18,7 @@ class MySearchingDrawer extends StatefulWidget {
 
 class _MySearchingDrawerState extends State<MySearchingDrawer> {
 // VARIABLES PARA RECIBIR EL MODELO
+  bool showLineas = true;
   late Future<List<Linea>> _listlineas;
   List<Linea> _listLineasGet = [];
 
@@ -47,13 +48,12 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
         ));
       }
 
-      setState(() {
-        _listLineasGet = [];
-        for (Map linea in jsonData) {
-          _listLineasGet.add(Linea.fromJson(linea));
-          _listLineasGet2 = _listLineasGet;
-        }
-      });
+      _listLineasGet = [];
+      for (Map linea in jsonData) {
+        _listLineasGet.add(Linea.fromJson(linea));
+        _listLineasGet2 = _listLineasGet;
+      }
+      setState(() {});
     } else {
       throw Exception("Falló la conexión");
     }
@@ -61,21 +61,33 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
 
 // MÉTODO PARA LOS VALORES DEL BUSCADOR
   void updateList(String value) {
-    setState(() {
-      _listLineasGet = _listLineasGet2
-          .where((element) =>
-              element.descripcion.toLowerCase().contains(value.toLowerCase()))
-          .toList();
-    });
+    _listLineasGet = _listLineasGet2
+        .where((element) =>
+            element.descripcion.toLowerCase().contains(value.toLowerCase()))
+        .toList();
+    if (_listLineasGet.isEmpty || _listLineasGet2.isEmpty) {
+      showLineas = false;
+      setState(() {});
+    } else {
+      showLineas = true;
+      setState(() {});
+    }
   }
 
   @override
   void initState() {
     //Inicializar los datos
+    verifGetLineas();
     super.initState();
-    _getLineas();
   }
-final leftEditIcon = Container(
+
+  void verifGetLineas() async {
+    if (showLineas = true) {
+      await _getLineas();
+    }
+  }
+
+  final leftEditIcon = Container(
     margin: const EdgeInsets.only(bottom: 10),
     color: const Color.fromARGB(255, 94, 102, 168).withOpacity(0.5),
     alignment: Alignment.center,
@@ -91,7 +103,7 @@ final leftEditIcon = Container(
 
   @override
   Widget build(BuildContext context) {
-    if (_listLineasGet.isEmpty) {
+    if (_listLineasGet.isEmpty && _listLineasGet2.isEmpty) {
       return const LoadingPage();
     } else {
       return Drawer(
@@ -127,9 +139,9 @@ final leftEditIcon = Container(
                           color: Colors.white),
                     ),
                     const SizedBox(
-                          height: 20,
-                        ),
-                        //IMPLEMEN
+                      height: 20,
+                    ),
+                    //IMPLEMEN
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -139,13 +151,19 @@ final leftEditIcon = Container(
                             FloatingActionButton(
                               backgroundColor: Colors.green[800],
                               onPressed: () => {},
-                              child:  const Icon(
+                              child: const Icon(
                                 Icons.place,
                                 color: Colors.white,
                               ),
                             ),
-                            const SizedBox(height: 5,),
-                            Text("2da. Funcionalidad", style: TextStyle(color: Colors.green[900], fontSize: 13),),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              "2da. Funcionalidad",
+                              style: TextStyle(
+                                  color: Colors.green[900], fontSize: 13),
+                            ),
                           ],
                         ),
                         const SizedBox(
@@ -162,8 +180,14 @@ final leftEditIcon = Container(
                                 color: Colors.white,
                               ),
                             ),
-                            const SizedBox(height: 5,),
-                                Text("3ra. Funcionalidad", style: TextStyle(color: Colors.green[900], fontSize: 13),),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              "3ra. Funcionalidad",
+                              style: TextStyle(
+                                  color: Colors.green[900], fontSize: 13),
+                            ),
                           ],
                         ),
                       ],
@@ -203,461 +227,456 @@ final leftEditIcon = Container(
                                   ),
                                   prefixIconColor: Colors.green.shade900),
                             ),
-                            Column(
-                              children: [
-                                /*ListView.builder(
-                                shrinkWrap: true,
-                                padding: EdgeInsets.all(10),
-                                itemCount: lineas.length,
-                                itemBuilder: (context, index) => ListTile(
-                                  selectedColor: Colors.green.shade900,
-                                  hoverColor: Colors.green.shade900,
-                                  minLeadingWidth: 80,
-                                  contentPadding:
-                                      const EdgeInsets.only(top: 15),
-                                  selected: true,
-                                  title: Text(
-                                    lineas[index].name,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  leading: Image.asset("assets/logo.png"),
-                                ),
-                              ),*/
-
-                                // MOSTRAR LA LISTA DE MICROS
-                                ListView.builder(
-                                    shrinkWrap: true,
-                                    padding: const EdgeInsets.all(10),
-                                    itemCount: _listLineasGet.length,
-                                    itemBuilder: (context, index) {
-                                      return Dismissible(
-                                        background: leftEditIcon,
-                                        secondaryBackground: rightEditIcon,
-                                        onDismissed:
-                                            (DismissDirection direction) {
-                                          print("after dismiss");
-                                        },
-                                        confirmDismiss:
-                                            (DismissDirection direction) async {
-                                          if (direction ==
-                                              DismissDirection.startToEnd) {
-                                            showModalBottomSheet(
-                                                backgroundColor:
-                                                    Colors.transparent.withOpacity(0.1),
-                                                barrierColor: Colors.transparent
-                                                    .withOpacity(0.9),
-                                                context: context,
-                                                builder: (_) {
-                                                  return Container(
-                                                    height: 550,
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(
-                                                              0xFF2e3253)
-                                                          .withOpacity(0.4),
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                              .only(
-                                                        topLeft:
-                                                            Radius.circular(20),
-                                                        topRight:
-                                                            Radius.circular(20),
-                                                      ),
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                        left: 20,
-                                                        right: 20,
-                                                      ),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          // Colocar los botones
-                                                          MyButton(
-                                                            backgroundColor:
-                                                                Colors.white,
-                                                            text: "Ida",
-                                                            textColor: Colors
-                                                                .green.shade900,
-                                                            onTap: () {
-                                                              //AQUÍ COLOCAR LA POLYLINE DE LA IDA
-                                                              Navigator.push(
-                                                                    context,
-                                                                    MaterialPageRoute(
-                                                                        builder: (context) => RecorridoLineas(
-                                                                            int.parse(_listLineasGet[index].id),
-                                                                            1, null, null)));
-                                                            },
-                                                          ),
-
-                                                          const SizedBox(
-                                                              height: 20),
-                                                          MyButton(
-                                                            backgroundColor:
-                                                                Colors.white,
-                                                            text: "Vuelta",
-                                                            textColor: Colors
-                                                                .green.shade900,
-                                                            onTap: () {
-                                                              //AQUÍ COLOCAR LA POLYLINE DE LA VUELTA
-                                                              Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                      builder: (context) => RecorridoLineas(
-                                                                          int.parse(
-                                                                              _listLineasGet[index].id),
-                                                                          2, null, null)));
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  );
-                                                });
-                                            return false;
-                                          } else {
-                                            showModalBottomSheet(
-                                                backgroundColor:
-                                                    Colors.transparent.withOpacity(0.1),
-                                                barrierColor: Colors.transparent
-                                                    .withOpacity(0.9),
-                                                context: context,
-                                                builder: (_) {
-                                                  return Container(
-                                                    height: 550,
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(
-                                                              0xFF2e3253)
-                                                          .withOpacity(0.4),
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                              .only(
-                                                        topLeft:
-                                                            Radius.circular(20),
-                                                        topRight:
-                                                            Radius.circular(20),
-                                                      ),
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                        left: 20,
-                                                        right: 20,
-                                                      ),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          // Colocar los botones
-                                                          const Text(
-                                                            "Información del Micro: ",
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 30,
-                                                                color: Colors
-                                                                    .white),
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-
-                                                          ClipRRect(
+                            (showLineas)
+                                ? Column(
+                                    children: [
+                                      // MOSTRAR LA LISTA DE MICROS
+                                      ListView.builder(
+                                          shrinkWrap: true,
+                                          padding: const EdgeInsets.all(10),
+                                          itemCount: _listLineasGet.length,
+                                          itemBuilder: (context, index) {
+                                            return Dismissible(
+                                              background: leftEditIcon,
+                                              secondaryBackground:
+                                                  rightEditIcon,
+                                              onDismissed:
+                                                  (DismissDirection direction) {
+                                                print("after dismiss");
+                                              },
+                                              confirmDismiss: (DismissDirection
+                                                  direction) async {
+                                                if (direction ==
+                                                    DismissDirection
+                                                        .startToEnd) {
+                                                  showModalBottomSheet(
+                                                      backgroundColor: Colors
+                                                          .transparent
+                                                          .withOpacity(0.1),
+                                                      barrierColor: Colors
+                                                          .transparent
+                                                          .withOpacity(0.9),
+                                                      context: context,
+                                                      builder: (_) {
+                                                        return Container(
+                                                          height: 550,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: const Color(
+                                                                    0xFF2e3253)
+                                                                .withOpacity(
+                                                                    0.4),
                                                             borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        90),
-                                                            child: Image.asset(
-                                                              _listLineasGet[
-                                                                      index]
-                                                                  .foto,
-                                                              width: 100,
-                                                              height: 100,
-                                                              fit: BoxFit.cover,
-                                                              scale: 10,
+                                                                const BorderRadius
+                                                                    .only(
+                                                              topLeft: Radius
+                                                                  .circular(20),
+                                                              topRight: Radius
+                                                                  .circular(20),
                                                             ),
                                                           ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                              left: 20,
+                                                              right: 20,
+                                                            ),
+                                                            child: Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                // Colocar los botones
+                                                                MyButton(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  text: "Ida",
+                                                                  textColor: Colors
+                                                                      .green
+                                                                      .shade900,
+                                                                  onTap: () {
+                                                                    //AQUÍ COLOCAR LA POLYLINE DE LA IDA
+                                                                    Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) => RecorridoLineas(
+                                                                                int.parse(_listLineasGet[index].id),
+                                                                                1,
+                                                                                null,
+                                                                                null)));
+                                                                  },
+                                                                ),
 
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              const Text(
-                                                                "Id: ",
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                              Text(
-                                                                _listLineasGet[
-                                                                        index]
-                                                                    .id,
-                                                                style: TextStyle(
-                                                                    fontStyle:
-                                                                        FontStyle
-                                                                            .italic,
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: Colors
-                                                                        .green.shade500),
-                                                              ),
-                                                            ],
+                                                                const SizedBox(
+                                                                    height: 20),
+                                                                MyButton(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  text:
+                                                                      "Vuelta",
+                                                                  textColor: Colors
+                                                                      .green
+                                                                      .shade900,
+                                                                  onTap: () {
+                                                                    //AQUÍ COLOCAR LA POLYLINE DE LA VUELTA
+                                                                    Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) => RecorridoLineas(
+                                                                                int.parse(_listLineasGet[index].id),
+                                                                                2,
+                                                                                null,
+                                                                                null)));
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            ),
                                                           ),
-                                                          const SizedBox(
-                                                            height: 10,
+                                                        );
+                                                      });
+                                                  return false;
+                                                } else {
+                                                  showModalBottomSheet(
+                                                      backgroundColor: Colors
+                                                          .transparent
+                                                          .withOpacity(0.1),
+                                                      barrierColor: Colors
+                                                          .transparent
+                                                          .withOpacity(0.9),
+                                                      context: context,
+                                                      builder: (_) {
+                                                        return Container(
+                                                          height: 550,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: const Color(
+                                                                    0xFF2e3253)
+                                                                .withOpacity(
+                                                                    0.4),
+                                                            borderRadius:
+                                                                const BorderRadius
+                                                                    .only(
+                                                              topLeft: Radius
+                                                                  .circular(20),
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                            ),
                                                           ),
-
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              const Text(
-                                                                "Código: ",
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                              Text(
-                                                                _listLineasGet[
-                                                                        index]
-                                                                    .code,
-                                                                style: TextStyle(
-                                                                    fontStyle:
-                                                                        FontStyle
-                                                                            .italic,
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: Colors
-                                                                        .green.shade500),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              const Text(
-                                                                "Dirección: ",
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                              Text(
-                                                                _listLineasGet[
-                                                                        index]
-                                                                    .direccion,
-                                                                style: TextStyle(
-                                                                    fontStyle:
-                                                                        FontStyle
-                                                                            .italic,
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: Colors
-                                                                        .green.shade500),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              const Text(
-                                                                "Teléfono: ",
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                               Text(
-                                                                _listLineasGet[
-                                                                        index]
-                                                                    .telefono,
-                                                                style: TextStyle(
-                                                                    fontStyle:
-                                                                        FontStyle
-                                                                            .italic,
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: Colors
-                                                                        .green.shade500),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              const Text(
-                                                                "Email: ",
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                              Text(
-                                                                _listLineasGet[
-                                                                        index]
-                                                                    .email,
-                                                                style: TextStyle(
-                                                                    fontStyle:
-                                                                        FontStyle
-                                                                            .italic,
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: Colors
-                                                                        .green.shade500),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 10,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              const Text(
-                                                                "Descripción: ",
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 200,
-                                                                child: Text(
-                                                                  _listLineasGet[
-                                                                          index]
-                                                                      .descripcion,
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                              left: 20,
+                                                              right: 20,
+                                                            ),
+                                                            child: Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                // Colocar los botones
+                                                                const Text(
+                                                                  "Información del Micro: ",
                                                                   style: TextStyle(
-                                                                      fontStyle:
-                                                                          FontStyle
-                                                                              .italic,
-                                                                      fontSize:
-                                                                          20,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
+                                                                      fontSize:
+                                                                          30,
                                                                       color: Colors
-                                                                          .green.shade500),
-                                                                  maxLines: 2,
+                                                                          .white),
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  );
-                                                });
-                                            return false;
-                                          }
-                                        },
-                                        key: ObjectKey(index),
-                                        child: ListTile(
-                                          selectedColor: Colors.green.shade900,
-                                          hoverColor: Colors.green.shade900,
-                                          minLeadingWidth: 80,
-                                          contentPadding:
-                                              const EdgeInsets.only(top: 15),
-                                          selected: true,
-                                          title: Text(
-                                            _listLineasGet[index].code,
-                                            style: TextStyle(
-                                                color: Colors.green.shade900,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20),
-                                          ),
-                                          leading: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            child: Image.asset(
-                                              _listLineasGet[index].foto,
-                                              width: 100,
-                                              height: 100,
-                                              scale: 10,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          trailing: const Icon(
-                                            Icons.compare_arrows,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      );
-                                    }
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
 
-                                    /*ListTile(
+                                                                ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              90),
+                                                                  child: Image
+                                                                      .asset(
+                                                                    _listLineasGet[
+                                                                            index]
+                                                                        .foto,
+                                                                    width: 100,
+                                                                    height: 100,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                    scale: 10,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Id: ",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    Text(
+                                                                      _listLineasGet[
+                                                                              index]
+                                                                          .id,
+                                                                      style: TextStyle(
+                                                                          fontStyle: FontStyle
+                                                                              .italic,
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color: Colors
+                                                                              .green
+                                                                              .shade500),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Código: ",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    Text(
+                                                                      _listLineasGet[
+                                                                              index]
+                                                                          .code,
+                                                                      style: TextStyle(
+                                                                          fontStyle: FontStyle
+                                                                              .italic,
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color: Colors
+                                                                              .green
+                                                                              .shade500),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Dirección: ",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    Text(
+                                                                      _listLineasGet[
+                                                                              index]
+                                                                          .direccion,
+                                                                      style: TextStyle(
+                                                                          fontStyle: FontStyle
+                                                                              .italic,
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color: Colors
+                                                                              .green
+                                                                              .shade500),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Teléfono: ",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    Text(
+                                                                      _listLineasGet[
+                                                                              index]
+                                                                          .telefono,
+                                                                      style: TextStyle(
+                                                                          fontStyle: FontStyle
+                                                                              .italic,
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color: Colors
+                                                                              .green
+                                                                              .shade500),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Email: ",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    Text(
+                                                                      _listLineasGet[
+                                                                              index]
+                                                                          .email,
+                                                                      style: TextStyle(
+                                                                          fontStyle: FontStyle
+                                                                              .italic,
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color: Colors
+                                                                              .green
+                                                                              .shade500),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 10,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    const Text(
+                                                                      "Descripción: ",
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      width:
+                                                                          200,
+                                                                      child:
+                                                                          Text(
+                                                                        _listLineasGet[index]
+                                                                            .descripcion,
+                                                                        style: TextStyle(
+                                                                            fontStyle: FontStyle
+                                                                                .italic,
+                                                                            fontSize:
+                                                                                20,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            color: Colors.green.shade500),
+                                                                        maxLines:
+                                                                            2,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      });
+                                                  return false;
+                                                }
+                                              },
+                                              key: ObjectKey(index),
+                                              child: ListTile(
+                                                selectedColor:
+                                                    Colors.green.shade900,
+                                                hoverColor:
+                                                    Colors.green.shade900,
+                                                minLeadingWidth: 80,
+                                                contentPadding:
+                                                    const EdgeInsets.only(
+                                                        top: 15),
+                                                selected: true,
+                                                title: Text(
+                                                  _listLineasGet[index].code,
+                                                  style: TextStyle(
+                                                      color:
+                                                          Colors.green.shade900,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 20),
+                                                ),
+                                                leading: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  child: Image.asset(
+                                                    _listLineasGet[index].foto,
+                                                    width: 100,
+                                                    height: 100,
+                                                    scale: 10,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                                trailing: const Icon(
+                                                  Icons.compare_arrows,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            );
+                                          }
+
+                                          /*ListTile(
                                   selectedColor: Colors.green.shade900,
                                   hoverColor: Colors.green.shade900,
                                   minLeadingWidth: 80,
@@ -673,10 +692,21 @@ final leftEditIcon = Container(
                                   ),
                                   leading: Image.asset("assets/logo.png"),
                                 ),*/
+                                          ),
+                                      //getData(),
+                                    ],
+                                  )
+                                : Container(
+                                    padding: EdgeInsets.only(top: 15),
+                                    child: Text(
+                                      "No existen líneas con esta característica.",
+                                      style: TextStyle(
+                                          fontStyle: FontStyle.italic,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green[900],
+                                          fontSize: 15),
                                     ),
-                                //getData(),
-                              ],
-                            ),
+                                  ),
                           ],
                         ),
                       ),
