@@ -26,17 +26,17 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
 
 // PETICIÓN GET DE DATOS DEL MODELO A LA API
   Future<Null> _getLineas() async {
-    Uri url = Uri.parse('http://10.0.2.2/trip_planner_bd/public/api/linea');
-    // final urlPrincipal = ServerProvider().url;
-    // Uri url = Uri.parse('$urlPrincipal/api/linea');
+    // Uri url = Uri.parse('http://10.0.2.2/trip_planner_bd/public/api/linea');
+    final urlPrincipal = ServerProvider().url;
+    Uri url = Uri.parse('$urlPrincipal/api/linea');
     final response = await http.get(url);
     List<Linea> data = [];
     if (response.statusCode == 200) {
       String body = utf8.decode(response.bodyBytes);
       final jsonData = json.decode(body);
       for (var item in jsonData) {
-        print(item["id"]);
-        print("Diego Hurtado Vargas");
+        // print(item["id"]);
+        // print("Diego Hurtado Vargas");
         data.add(Linea(
           id: item["id"].toString(),
           code: item["code"],
@@ -122,7 +122,6 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
               )),
-              child: Expanded(
                 child: Column(
                   children: [
                     Container(
@@ -195,7 +194,6 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       width: 1000,
-                      child: Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -710,11 +708,9 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                           ],
                         ),
                       ),
-                    )
                   ],
                 ),
               ),
-            ),
           ],
         ),
       );
