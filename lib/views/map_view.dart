@@ -57,6 +57,7 @@ class _MapViewState extends State<MapView> {
   final Set<Marker> _markers2 = {};
   final Set<Polyline> _polyline = {};
   List<LatLng> latlng = [];
+  List<double> distances = [];
   var recorridos = 0;
   var origens = null;
 
@@ -92,6 +93,9 @@ class _MapViewState extends State<MapView> {
   }
 
   loadData2() async {
+   
+   
+   
     final Uint8List markerIcon = await getBytesFromAssets(images, 125);
 
     _markers2.add(Marker(
