@@ -62,6 +62,7 @@ class _MapViewState extends State<MapView> {
   final Set<Polyline> _polyline = {};
   List<LatLng> latlng = [];
   List<LatLng> latlng2 = [];
+  List<double> distances = [];
   var recorridos = 0;
   var origens = null;
   LatLng? puntoOrigen;
@@ -77,6 +78,8 @@ class _MapViewState extends State<MapView> {
     super.initState();
     if (recorrido != 0) {
       //Lineas
+      print('aaaa');
+      print(parImpar.toString());
       if (parImpar != 0) {
         PuntosService.getPuntos(recorrido, parImpar).then((puntos) {
           setState(() {
@@ -111,10 +114,10 @@ class _MapViewState extends State<MapView> {
     if (origen != null) {
       setState(() {
         loadData3();
-        puntoOrigen = LatLng(widget.startPosition!.geometry!.location!.lat!, 
-                        widget.startPosition!.geometry!.location!.lng!);
-        puntoDestino = LatLng(widget.endPosition!.geometry!.location!.lat!, 
-                        widget.endPosition!.geometry!.location!.lng!);
+        // puntoOrigen = LatLng(widget.startPosition!.geometry!.location!.lat!,
+        //                 widget.startPosition!.geometry!.location!.lng!);
+        // puntoDestino = LatLng(widget.endPosition!.geometry!.location!.lat!,
+        //                 widget.endPosition!.geometry!.location!.lng!);
       });
     }
     setState(() {
