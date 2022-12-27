@@ -11,6 +11,7 @@ import 'package:trip_planner/complements/loading_page.dart';
 import 'package:trip_planner/complements/loading_page2.dart';
 import 'package:trip_planner/helpers/helpers.dart';
 import 'package:trip_planner/models/models.dart';
+import 'package:trip_planner/pages/prueba.dart';
 import 'package:trip_planner/providers/providers.dart';
 import 'package:trip_planner/services/services.dart';
 import 'package:geocoding/geocoding.dart';
@@ -33,6 +34,7 @@ class MapView extends StatefulWidget {
 class _MapViewState extends State<MapView> {
   Completer<GoogleMapController> _controller = Completer();
   List<PuntosModel> _puntos = [];
+  List<PuntosModel> _puntos2 = [];
 
   final CameraPosition _kGooglePlex = const CameraPosition(
     target: LatLng(-17.782158, -63.180684),
@@ -41,6 +43,8 @@ class _MapViewState extends State<MapView> {
 
   String? direccion;
   String? direccion2;
+  String? direccion3;
+  String? direccion4;
   String images = 'assets/destino bandera.png';
 
   Future<Uint8List> getBytesFromAssets(String path, int width) async {
@@ -54,11 +58,14 @@ class _MapViewState extends State<MapView> {
   }
 
   final Set<Marker> _markers = {};
-  final Set<Marker> _markers2 = {};
+  final Set<Marker> _markers3 = {};
   final Set<Polyline> _polyline = {};
   List<LatLng> latlng = [];
+  List<LatLng> latlng2 = [];
   var recorridos = 0;
   var origens = null;
+  LatLng? puntoOrigen;
+  LatLng? puntoDestino;
 
   @override
   void initState() {
@@ -70,19 +77,44 @@ class _MapViewState extends State<MapView> {
     super.initState();
     if (recorrido != 0) {
       //Lineas
-      PuntosService.getPuntos(recorrido, parImpar).then((puntos) {
-        setState(() {
-          _puntos = puntos;
-          latlng = listaLatLng(_puntos);
-          loadData();
+      if (parImpar != 0) {
+        PuntosService.getPuntos(recorrido, parImpar).then((puntos) {
+          setState(() {
+            _puntos = puntos;
+            latlng = listaLatLng(_puntos);
+            loadData();
+          });
         });
-      });
-      Provider.of<PuntosProvider>(context, listen: false)
-          .setPunto(recorrido, parImpar);
+        Provider.of<PuntosProvider>(context, listen: false)
+            .setPunto(recorrido, parImpar);
+      } else {
+        PuntosService.getPuntos(recorrido, 1).then((puntos) {
+          setState(() {
+            _puntos = puntos;
+            latlng = listaLatLng(_puntos);
+            loadData();
+          });
+        });
+        Provider.of<PuntosProvider>(context, listen: false)
+            .setPunto(recorrido, 1);
+        PuntosService.getPuntos(recorrido, 2).then((puntos) {
+          setState(() {
+            _puntos2 = puntos;
+            latlng2 = listaLatLng(_puntos2);
+            loadData2();
+          });
+        });
+        Provider.of<PuntosProvider>(context, listen: false)
+            .setPunto(recorrido, 2);
+      }
     }
     if (origen != null) {
       setState(() {
-        loadData2();
+        loadData3();
+        puntoOrigen = LatLng(widget.startPosition!.geometry!.location!.lat!, 
+                        widget.startPosition!.geometry!.location!.lng!);
+        puntoDestino = LatLng(widget.endPosition!.geometry!.location!.lat!, 
+                        widget.endPosition!.geometry!.location!.lng!);
       });
     }
     setState(() {
@@ -91,10 +123,10 @@ class _MapViewState extends State<MapView> {
     });
   }
 
-  loadData2() async {
+  loadData3() async {
     final Uint8List markerIcon = await getBytesFromAssets(images, 125);
 
-    _markers2.add(Marker(
+    _markers3.add(Marker(
         markerId: const MarkerId('start'),
         position: LatLng(widget.startPosition!.geometry!.location!.lat!,
             widget.startPosition!.geometry!.location!.lng!),
@@ -103,12 +135,11 @@ class _MapViewState extends State<MapView> {
         ),
         draggable: true,
         onDragEnd: (newPosition1) {
-          // posicion1 = newPosition1;
-          print('Primero');
-          print(newPosition1.latitude.toString() +
-              newPosition1.longitude.toString());
+          puntoOrigen = newPosition1;
+          // print('Primero');
+          // print(puntoOrigen!.latitude.toString() + puntoOrigen!.longitude.toString());
         }));
-    _markers2.add(Marker(
+    _markers3.add(Marker(
         markerId: const MarkerId('end'),
         position: LatLng(widget.endPosition!.geometry!.location!.lat!,
             widget.endPosition!.geometry!.location!.lng!),
@@ -118,10 +149,9 @@ class _MapViewState extends State<MapView> {
         icon: BitmapDescriptor.fromBytes(markerIcon),
         draggable: true,
         onDragEnd: (newPosition2) {
-          // posicion1 = newPosition1;
-          print('Segundo');
-          print(newPosition2.latitude.toString() +
-              newPosition2.longitude.toString());
+          puntoDestino = newPosition2;
+          // print('Segundo');
+          // print(puntoDestino!.latitude.toString() + puntoDestino!.longitude.toString());
         }));
   }
 
@@ -146,7 +176,7 @@ class _MapViewState extends State<MapView> {
           colores = Colors.blue;
         }
         break;
-      
+
       case 'Green':
         {
           colores = Colors.green;
@@ -274,6 +304,116 @@ class _MapViewState extends State<MapView> {
     ));
   }
 
+  loadData2() async {
+    int lineaMicro = _puntos2[0].lineaId;
+    switch (lineaMicro) {
+      case 1:
+        {
+          lineaMicro = 1;
+        }
+        break;
+
+      case 2:
+        {
+          lineaMicro = 2;
+        }
+        break;
+
+      case 3:
+        {
+          lineaMicro = 5;
+        }
+        break;
+
+      case 4:
+        {
+          lineaMicro = 8;
+        }
+        break;
+
+      case 5:
+        {
+          lineaMicro = 9;
+        }
+        break;
+
+      case 6:
+        {
+          lineaMicro = 10;
+        }
+        break;
+
+      case 7:
+        {
+          lineaMicro = 11;
+        }
+        break;
+
+      case 8:
+        {
+          lineaMicro = 16;
+        }
+        break;
+
+      case 9:
+        {
+          lineaMicro = 17;
+        }
+        break;
+
+      case 10:
+        {
+          lineaMicro = 18;
+        }
+        break;
+    }
+
+    var camino = 'Ida';
+    if (_puntos2[0].recorridosId % 2 == 0) {
+      camino = 'Vuelta';
+    }
+
+    int l = latlng2.length - 1;
+    List<Placemark> placemarks3 = await placemarkFromCoordinates(
+        latlng2[0].latitude, latlng2[0].longitude);
+    direccion3 = placemarks3.reversed.last.thoroughfare.toString();
+
+    List<Placemark> placemarks4 = await placemarkFromCoordinates(
+        latlng2[l].latitude, latlng2[l].longitude);
+    direccion4 = placemarks4.reversed.last.thoroughfare.toString();
+
+    final Uint8List markerIcon2 = await getBytesFromAssets(images, 125);
+
+    _markers.add(Marker(
+      markerId: MarkerId(1.toString()),
+      position: latlng2[0],
+      infoWindow: InfoWindow(
+        title: 'Inicio $direccion3',
+        snippet: 'Linea de $lineaMicro de $camino',
+      ),
+      icon: BitmapDescriptor.defaultMarker,
+    ));
+    for (int i = 0; i < latlng.length; i++) {
+      setState(() {});
+      _polyline.add(Polyline(
+          polylineId: PolylineId('2'),
+          points: latlng2,
+          color: Colors.black,
+          width: 7,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap));
+    }
+    _markers.add(Marker(
+      markerId: MarkerId(l.toString()),
+      position: latlng2[l],
+      infoWindow: InfoWindow(
+        title: 'Fin $direccion4',
+        snippet: 'Linea de $lineaMicro de $camino',
+      ),
+      icon: BitmapDescriptor.fromBytes(markerIcon2),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
@@ -302,37 +442,6 @@ class _MapViewState extends State<MapView> {
         })),
       );
     } else if (origens != null) {
-      // Set<Marker> _markers = {
-      //   Marker(
-      //       markerId: MarkerId('start'),
-      //       position: LatLng(widget.startPosition!.geometry!.location!.lat!,
-      //           widget.startPosition!.geometry!.location!.lng!),
-      //       infoWindow: const InfoWindow(
-      //         title: 'Origen',
-      //       ),
-      //       draggable: true,
-      //       onDragEnd: (newPosition1) {
-      //         // posicion1 = newPosition1;
-      //         print('Primero');
-      //         print(newPosition1.latitude.toString() +
-      //             newPosition1.longitude.toString());
-      //       }),
-      //   Marker(
-      //     markerId: MarkerId('end'),
-      //     position: LatLng(widget.endPosition!.geometry!.location!.lat!,
-      //         widget.endPosition!.geometry!.location!.lng!),
-      //     infoWindow: const InfoWindow(
-      //       title: 'Destino',
-      //     ),
-      //     draggable: true,
-      //     onDragEnd: (newPosition2) {
-      //       // posicion2 = newPosition2;
-      //       print('Segundo');
-      //       print(newPosition2.latitude.toString() +
-      //           newPosition2.longitude.toString());
-      //     },
-      //   ),
-      // };
       //Buscador
       return SizedBox(
         width: size.width,
@@ -341,7 +450,7 @@ class _MapViewState extends State<MapView> {
           children: [
             GoogleMap(
               initialCameraPosition: _kGooglePlex,
-              markers: _markers2,
+              markers: _markers3,
               compassEnabled: false,
               myLocationEnabled: true,
               zoomControlsEnabled: false,
@@ -351,7 +460,7 @@ class _MapViewState extends State<MapView> {
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 10),
-              margin: EdgeInsets.only(top: 500, right: 100, left: 100),
+              margin: EdgeInsets.only(top: 650, right: 100, left: 100),
               decoration: BoxDecoration(
                 color: Colors.green[900],
                 borderRadius: BorderRadius.only(
@@ -382,7 +491,19 @@ class _MapViewState extends State<MapView> {
                   color: Colors.white,
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, 'recommendation');
+                  // print('Primero y Segundo');
+                  // print(puntoOrigen!.latitude.toString() + puntoOrigen!.longitude.toString());
+                  // print(puntoDestino!.latitude.toString() + puntoDestino!.longitude.toString());
+                  // Navigator.pushNamed(context, 'recommendation');
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => Prueba(
+                  //       puntoOrigen: puntoOrigen!,
+                  //       puntoDestino: puntoDestino!,
+                  //     )
+                  //   )
+                  // );
                 },
               ),
             ),

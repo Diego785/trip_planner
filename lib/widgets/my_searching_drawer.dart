@@ -324,6 +324,28 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                             null)));
                                                               },
                                                             ),
+
+                                                            const SizedBox(
+                                                                height: 20),
+                                                            MyButton(
+                                                              backgroundColor:
+                                                                  Colors.white,
+                                                              text: "Ida - Vuelta",
+                                                              textColor: Colors
+                                                                  .green
+                                                                  .shade900,
+                                                              onTap: () {
+                                                                //AQUÍ COLOCAR LA POLYLINE DE LA IDA Y VUELTA
+                                                                Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder: (context) => RecorridoLineas(
+                                                                            int.parse(_listLineasGet[index].id),
+                                                                            0,
+                                                                            null,
+                                                                            null)));
+                                                              },
+                                                            ),
                                                           ],
                                                         ),
                                                       ),
