@@ -25,8 +25,8 @@ class Punto {
 
   int id;
   int orden;
-  int punto;
-  int puntoD;
+  String punto;
+  String puntoD;
   String longi;
   String lati;
   String longiD;

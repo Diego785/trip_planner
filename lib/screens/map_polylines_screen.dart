@@ -137,7 +137,7 @@ class _MapPolylinesScreenState extends State<MapPolylinesScreen> {
 
     var color = Colors.green;
     var camino = 'Ida';
-    if (_puntos[0].recorridosId % 2 == 0) {
+    if (_puntos[0].recorridoId % 2 == 0) {
       color = Colors.red;
       camino = 'Vuelta';
     }

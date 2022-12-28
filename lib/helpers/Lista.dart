@@ -22,6 +22,25 @@ List<LatLng> listaLatLng(List<PuntosModel> points) {
   return lista;
 }
 
+List<LatLng> listaLatLng2(List<RutaModel> points) {
+  List<LatLng> lista = [];
+  //List<double> distances = [];
+  for (int i = 0; i < points.length; i++) {
+    lista.add(
+        LatLng(double.parse(points[i].lati), double.parse(points[i].longi)));
+    // distances.add(Geolocator.distanceBetween(
+    //     double.parse(points[i].lati),
+    //     double.parse(points[i].longi),
+    //     double.parse(points[i + 1].lati),
+    //     double.parse(points[i + 1].longi)));
+  }
+
+  // distances.forEach((element) {
+  //   print(element);
+  // });
+  return lista;
+}
+
 double listaLatLngDistance(List<PuntosModel> points) {
   double distance = 0;
   for (int i = 0; i < points.length - 1; i++) {

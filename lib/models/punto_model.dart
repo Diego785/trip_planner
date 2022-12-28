@@ -13,7 +13,7 @@ class PuntosModel {
         required this.id,
         required this.longi,
         required this.lati,
-        required this.recorridosId,
+        required this.recorridoId,
         required this.lineaId,
         required this.color,
     });
@@ -21,7 +21,7 @@ class PuntosModel {
     int id;
     String longi;
     String lati; 
-    int recorridosId;
+    int recorridoId;
     int lineaId;
     String color;
 
@@ -29,7 +29,7 @@ class PuntosModel {
         id: json["id"],
         longi: json["longi"],
         lati: json["lati"],
-        recorridosId: json["recorridos_id"],
+        recorridoId: json["recorrido_id"],
         lineaId: json["linea_id"],
         color: json["color"],
     );
@@ -38,7 +38,7 @@ class PuntosModel {
         "id": id,
         "longi": longi,
         "lati": lati,
-        "recorridos_id": recorridosId,
+        "recorrido_id": recorridoId,
         "linea_id": lineaId,
         "color": color,
     };
