@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_place/google_place.dart';
 import 'package:trip_planner/blocs/blocs.dart';
-import 'package:trip_planner/views/map_view.dart';
+import 'package:trip_planner/views/map_view_copy.dart';
 import 'package:trip_planner/widgets/my_float_action_button.dart';
 import 'package:trip_planner/widgets/my_searching_drawer.dart';
 import 'package:trip_planner/widgets/widgets.dart';
