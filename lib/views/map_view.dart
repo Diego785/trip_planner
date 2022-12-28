@@ -84,6 +84,11 @@ class _MapViewState extends State<MapView> {
   double timeOneRouteStart = 0;
   double timeOneRouteEnd = 0;
   bool addPerson = false;
+  bool loadingScreen = false;
+  double startPointLongi = 0;
+  double startPointLati = 0;
+  double endPointLongi = 0;
+  double endPointLati = 0;
 
   var recorridos = 0;
   var origens = null;
@@ -247,7 +252,51 @@ class _MapViewState extends State<MapView> {
   }
 
   loadData3() async {
-    print("Entró al loadData2");
+//--------------------------------------------------------------------------------------------------------------------------------------------------
+    final Uint8List markerIcon = await getBytesFromAssets(images, 125);
+
+    _markers2.add(Marker(
+        markerId: const MarkerId('start'),
+        position: (startPointLati != 0 && startPointLongi != 0)
+            ? LatLng(startPointLati, startPointLongi)
+            : LatLng(widget.startPosition!.geometry!.location!.lat!,
+                widget.startPosition!.geometry!.location!.lng!),
+        infoWindow: const InfoWindow(
+          title: 'Origen',
+        ),
+        draggable: true,
+        onDragEnd: (newPosition1) {
+          // posicion1 = newPosition1;
+          startPointLati = newPosition1.latitude;
+          startPointLongi = newPosition1.longitude;
+
+          print('Primero');
+          print(newPosition1.latitude.toString() +
+              newPosition1.longitude.toString());
+        }));
+    _markers2.add(Marker(
+        markerId: const MarkerId('end'),
+        position: (endPointLati != 0 && endPointLongi != 0)
+            ? LatLng(endPointLati, endPointLongi)
+            : LatLng(widget.endPosition!.geometry!.location!.lat!,
+                widget.endPosition!.geometry!.location!.lng!),
+        infoWindow: const InfoWindow(
+          title: 'Destino',
+        ),
+        icon: BitmapDescriptor.fromBytes(markerIcon),
+        draggable: true,
+        onDragEnd: (newPosition2) {
+          // posicion1 = newPosition1;
+          endPointLati = newPosition2.latitude;
+          endPointLongi = newPosition2.longitude;
+          print('Segundo');
+          print(newPosition2.latitude.toString() +
+              newPosition2.longitude.toString());
+        }));
+  }
+
+  loadData4() async {
+    print("Entró al loadData4");
 
     // Find the nearest points to show the recommendations
     LatLng nearestPointStart = LatLng(0, 0);
@@ -256,10 +305,18 @@ class _MapViewState extends State<MapView> {
     // LatLng nearestPointStartOneBus = LatLng(0, 0);
     // LatLng nearestPointEndOneBus = LatLng(0, 0);
 
-    double startPointLongi = widget.startPosition!.geometry!.location!.lng!;
-    double startPointLati = widget.startPosition!.geometry!.location!.lat!;
-    double endPointLongi = widget.endPosition!.geometry!.location!.lng!;
-    double endPointLati = widget.endPosition!.geometry!.location!.lat!;
+    if (startPointLati == 0) {
+      startPointLati = widget.startPosition!.geometry!.location!.lat!;
+    }
+    if (startPointLongi == 0) {
+      startPointLongi = widget.startPosition!.geometry!.location!.lng!;
+    }
+    if (endPointLati == 0) {
+      endPointLati = widget.endPosition!.geometry!.location!.lat!;
+    }
+    if (endPointLongi == 0) {
+      endPointLongi = widget.endPosition!.geometry!.location!.lng!;
+    }
 
     double menorStartLati = 999.9;
     double menorStartLongi = 999.9;
@@ -357,44 +414,13 @@ class _MapViewState extends State<MapView> {
     print(
         'El punto más cercano al punto de finalización es: ($nearestPointEnd) y le pertenece a la línea con el recorrido $microFinal');
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------
-    final Uint8List markerIcon = await getBytesFromAssets(images, 125);
     final Uint8List walking = await getBytesFromAssets(personWalking, 125);
     final Uint8List markerPoinRecomendations =
         await getBytesFromAssets(pointRecommendation, 125);
+    final Uint8List markerIcon = await getBytesFromAssets(images, 125);
 
-    _markers2.add(Marker(
-        markerId: const MarkerId('start'),
-        position: LatLng(widget.startPosition!.geometry!.location!.lat!,
-            widget.startPosition!.geometry!.location!.lng!),
-        infoWindow: const InfoWindow(
-          title: 'Origen',
-        ),
-        draggable: true,
-        onDragEnd: (newPosition1) {
-          // posicion1 = newPosition1;
-          print('Primero');
-          print(newPosition1.latitude.toString() +
-              newPosition1.longitude.toString());
-        }));
-    _markers2.add(Marker(
-        markerId: const MarkerId('end'),
-        position: LatLng(widget.endPosition!.geometry!.location!.lat!,
-            widget.endPosition!.geometry!.location!.lng!),
-        infoWindow: const InfoWindow(
-          title: 'Destino',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerIcon),
-        draggable: true,
-        onDragEnd: (newPosition2) {
-          // posicion1 = newPosition1;
-          print('Segundo');
-          print(newPosition2.latitude.toString() +
-              newPosition2.longitude.toString());
-        }));
-
-//Recommendations
-
+    //Recommendations
+    _markers2.clear();
     _markers2.add(Marker(
         markerId: const MarkerId('startPointRecommendation'),
         position: nearestPointStart,
@@ -409,7 +435,23 @@ class _MapViewState extends State<MapView> {
           print(newPosition3.latitude.toString() +
               newPosition3.longitude.toString());
         }));
+    _markers2.add(Marker(
+        markerId: const MarkerId('start'),
+        position: LatLng(startPointLati, startPointLongi),
+        infoWindow: const InfoWindow(
+          title: 'Origen',
+        ),
+        draggable: true,
+        onDragEnd: (newPosition1) {
+          // posicion1 = newPosition1;
+          startPointLati = newPosition1.latitude;
+          startPointLongi = newPosition1.longitude;
+          print('Primero');
+          print(newPosition1.latitude.toString() +
+              newPosition1.longitude.toString());
+        }));
 
+    // _markers2.clear();
     _markers2.add(Marker(
         markerId: const MarkerId('endPointRecommendation'),
         position: nearestPointEnd,
@@ -424,12 +466,29 @@ class _MapViewState extends State<MapView> {
           print(newPosition4.latitude.toString() +
               newPosition4.longitude.toString());
         }));
+    _markers2.add(Marker(
+        markerId: const MarkerId('end'),
+        position: LatLng(endPointLati, endPointLongi),
+        infoWindow: const InfoWindow(
+          title: 'Destino',
+        ),
+        icon: BitmapDescriptor.fromBytes(markerIcon),
+        draggable: true,
+        onDragEnd: (newPosition2) {
+          // posicion1 = newPosition1;
+          endPointLati = newPosition2.latitude;
+          endPointLongi = newPosition2.longitude;
+          print('Segundo');
+          print(newPosition2.latitude.toString() +
+              newPosition2.longitude.toString());
+        }));
 
     if (_puntosStartOneRoute != null) {
       // Encuentra una sola ruta que lo lleva a destino con el micro que pasa en el punto inicial.
       await LineServices.getMicro(micro).then((linea) {
         setState(() {
           microLinea = linea;
+          loadingScreen = false;
           timeOneRouteStart =
               (distanceStartOneRoute / microLinea.first.velocidad) * 60;
         });
@@ -440,8 +499,7 @@ class _MapViewState extends State<MapView> {
           300) {
         _markers2.add(Marker(
           markerId: const MarkerId('walking'),
-          position: LatLng(widget.startPosition!.geometry!.location!.lat!,
-              widget.startPosition!.geometry!.location!.lng!),
+          position: LatLng(startPointLati, startPointLongi),
           icon: BitmapDescriptor.fromBytes(walking),
           draggable: true,
         ));
@@ -463,6 +521,7 @@ class _MapViewState extends State<MapView> {
       await LineServices.getMicro(microFinal).then((linea) {
         setState(() {
           microLinea = linea;
+          loadingScreen = false;
           timeOneRouteEnd =
               (distanceEndOneRoute / microLinea.first.velocidad) * 60;
         });
@@ -486,8 +545,7 @@ class _MapViewState extends State<MapView> {
           300) {
         _markers2.add(Marker(
           markerId: const MarkerId('walking'),
-          position: LatLng(widget.startPosition!.geometry!.location!.lat!,
-              widget.startPosition!.geometry!.location!.lng!),
+          position: LatLng(startPointLati, startPointLongi),
           icon: BitmapDescriptor.fromBytes(walking),
           draggable: true,
         ));
@@ -517,6 +575,7 @@ class _MapViewState extends State<MapView> {
       await PuntosService.getPuntos(recorrido2.truncate(), par2).then((puntos) {
         setState(() {
           _puntosStart = puntos;
+          loadingScreen = false;
           latlngStart = listaLatLng(_puntosStart);
           // loadData();
         });
@@ -843,8 +902,7 @@ class _MapViewState extends State<MapView> {
       return SizedBox(
         width: size.width,
         height: size.height,
-        child: (microLinea.isEmpty &&
-                (_puntosStart.isEmpty || _puntosEnd.isEmpty))
+        child: (_markers2.isEmpty || loadingScreen == true)
             ? const LoadingPage2()
             : Stack(
                 children: [
@@ -1093,7 +1151,7 @@ class _MapViewState extends State<MapView> {
                       : Container(
                           padding: EdgeInsets.symmetric(vertical: 10),
                           margin:
-                              EdgeInsets.only(top: 550, right: 100, left: 100),
+                              EdgeInsets.only(top: 450, right: 100, left: 100),
                           decoration: BoxDecoration(
                             color: Colors.green[900],
                             borderRadius: BorderRadius.only(
@@ -1114,7 +1172,7 @@ class _MapViewState extends State<MapView> {
                           ),
                           child: ListTile(
                             title: const Text(
-                              "Ver Sugerencias",
+                              "Ver Ruta óptima",
                               style: TextStyle(
                                   fontSize: 20,
                                   color: Colors.white,
@@ -1125,10 +1183,50 @@ class _MapViewState extends State<MapView> {
                               color: Colors.white,
                             ),
                             onTap: () {
-                              Navigator.pushNamed(context, 'recommendation');
+                              setState(() {
+                                loadData4();
+                                loadingScreen = true;
+                              });
                             },
                           ),
                         ),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    margin: EdgeInsets.only(top: 550, right: 100, left: 100),
+                    decoration: BoxDecoration(
+                      color: Colors.green[900],
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      title: const Text(
+                        "Ver Sugerencias",
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontStyle: FontStyle.italic),
+                      ),
+                      trailing: Icon(
+                        Icons.visibility,
+                        color: Colors.white,
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, 'recommendation');
+                      },
+                    ),
+                  ),
                 ],
               ),
       );
