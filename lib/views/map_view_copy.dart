@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:ui' as ui;
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -9,17 +8,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:trip_planner/blocs/blocs.dart';
 
-import 'package:trip_planner/complements/loading_page.dart';
 import 'package:trip_planner/complements/loading_page2.dart';
 import 'package:trip_planner/helpers/helpers.dart';
 import 'package:trip_planner/models/models.dart';
-import 'package:trip_planner/models/punto.dart';
 import 'package:trip_planner/models/specific_line.dart';
 import 'package:trip_planner/providers/providers.dart';
 import 'package:trip_planner/services/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_place/google_place.dart';
-import 'package:trip_planner/widgets/information_card.dart';
 
 class MapView extends StatefulWidget {
   final int recorrido;
