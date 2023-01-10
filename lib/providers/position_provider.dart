@@ -18,8 +18,8 @@ class PositionProvider with ChangeNotifier {
     //notifyListeners();
   }
 
-  set endPosition(DetailsResult? start) {
-    this._startPosition = start;
+  set endPosition(DetailsResult? end) {
+    this._endPosition = end;
     //notifyListeners();
   }
 }

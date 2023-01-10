@@ -90,6 +90,7 @@ class _MapViewState extends State<MapView> {
 
 //Variables para listar los micros que pasan por origen y destino
   List<int> nearestMicrosOrigen = [];
+  List<int> nearestMicrosDestiny = [];
   //Variables para guardar los micros que pasan por ambos puntos
   List<int> nearestMicrosOrigenOneRoute = [];
   // double distanceStartOneRoute = 0;
@@ -481,11 +482,19 @@ class _MapViewState extends State<MapView> {
           nearestMicrosOrigen.add(element.recorridoId);
           fid1 = element.id;
         }
+        if ((Geolocator.distanceBetween(double.parse(element.lati),
+                double.parse(element.longi), endPointLati, endPointLongi) <
+            300)) {
+          nearestMicrosDestiny.add(element.recorridoId);
+          fid1 = element.id;
+        }
       });
     });
 
     nearestMicrosOrigen = purgarMicros(
         nearestMicrosOrigen); // AQUÍ YA SE TIENE LOS MICROS QUE PASAN POR EL PUNTO DE ORIGEN, SIN REPETIDOS
+
+    nearestMicrosDestiny = purgarMicros(nearestMicrosDestiny);
 
     await verifOneRouteAndOrderOptimum(nearestMicrosOrigen);
     print(nearestMicrosOrigen);
