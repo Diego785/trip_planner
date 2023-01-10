@@ -26,11 +26,33 @@ class PuntosService {
     }
   }
 
+  static Future<List<RutaModel>> transbordo(int fid1, int fid2) async {
+    var params = {"fidorigen": fid1.toString(), "fiddestino": fid2.toString()};
+    final urlPrincipal = ServerProvider().url;
+    final url = Uri.parse('$urlPrincipal/api/transbordo');
+    //final url =  Uri.parse("http://10.0.2.2/trip_planner_bd/public/api/punto");
+    final urlP = url.replace(queryParameters: params);
+    final response = await http.get(urlP, headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    });
+    if (200 == response.statusCode) {
+      final respuesta = jsonDecode(response.body);
+      // print('aeea');
+      final List<RutaModel> puntos =
+          rutaModelFromJson(jsonEncode(respuesta['data']));
+      return puntos;
+    } else {
+      return List.empty();
+    }
+  }
+
   static Future<List<Punto>> getAllPuntos() async {
     //var params = {"recorrido": recorrido.toString(), "par": par.toString()};
-    // final url = Uri.parse("http://10.0.2.2/trip_planner_bd/public/api/allpoints");
     final urlPrincipal = ServerProvider().url;
     final url = Uri.parse('$urlPrincipal/api/allpoints');
+    // final url =
+    //     Uri.parse("http://10.0.2.2/trip_planner_bd/public/api/allpoints");
     final response = await http.get(url, headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',

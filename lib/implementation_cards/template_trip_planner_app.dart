@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trip_planner/implementation_cards/ui/contact_list_page.dart';
+import 'package:trip_planner/models/specific_line.dart';
 
 void main() {
   runApp(TemplateGalleryApp());
@@ -10,6 +11,8 @@ class TemplateGalleryApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+  List<SpecificLine> micros=[];
+  List<double> distances=[];
     return Theme(
       data: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xff23202a),
@@ -25,7 +28,7 @@ class TemplateGalleryApp extends StatelessWidget {
         ),
         iconTheme: const IconThemeData(color: Colors.grey),
       ),
-      child: const ContactListPage(),
+      child:  MicrosListPage(micros, distances),
     );
   }
 }

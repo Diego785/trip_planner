@@ -4,16 +4,20 @@ import 'package:trip_planner/implementation_cards/template_trip_planner_app.dart
 import 'package:trip_planner/implementation_cards/ui/contact_detail_screen.dart';
 import 'package:trip_planner/implementation_cards/ui/widgets/cards.dart';
 import 'package:trip_planner/implementation_cards/ui/widgets/perspective_list_view.dart';
+import 'package:trip_planner/models/specific_line.dart';
+import 'package:trip_planner/views/map_view_copy.dart';
 import 'package:trip_planner/widgets/my_searching_drawer.dart';
 
-class ContactListPage extends StatefulWidget {
-  const ContactListPage({super.key});
+class MicrosListPage extends StatefulWidget {
+  MicrosListPage(this.micros, this.distances);
+  List<SpecificLine> micros;
+  List<double> distances;
 
   @override
-  ContactListPageState createState() => ContactListPageState();
+  MicrosListPageState createState() => MicrosListPageState();
 }
 
-class ContactListPageState extends State<ContactListPage> {
+class MicrosListPageState extends State<MicrosListPage> {
   int? _visibleItems;
   double? _itemExtent;
 
@@ -53,8 +57,8 @@ class ContactListPageState extends State<ContactListPage> {
         ),
         child: PerspectiveListView(
           visualizedItems: _visibleItems,
-          itemExtent: _itemExtent,
-          initialIndex: 7,
+          itemExtent: 330,
+          initialIndex: 5,
           enableBackItemsShadow: true,
           backItemsShadowColor: Theme.of(context).scaffoldBackgroundColor,
           padding: const EdgeInsets.all(10),
@@ -66,16 +70,23 @@ class ContactListPageState extends State<ContactListPage> {
                 builder: (_) => ContactDetailScreen(
                   contact: Contact.contacts[index],
                   color: color,
+                  micro: widget.micros[widget.micros.length - index - 1],
+                  distance: widget.distances[widget.micros.length - index - 1],
                 ),
               ),
             );
           },
-          children: List.generate(Contact.contacts.length, (index) {
+          children: List.generate(widget.micros.length, (index) {
             final borderColor = Colors.accents[index % Colors.accents.length];
             final contact = Contact.contacts[index];
-            return ContactCard(
+            final micros = widget.micros[widget.micros.length - index - 1];
+            final distances =
+                widget.distances[widget.distances.length - index - 1];
+            return MicrosCard(
               borderColor: borderColor,
               contact: contact,
+              micros: micros,
+              distances: distances,
             );
           }),
         ),

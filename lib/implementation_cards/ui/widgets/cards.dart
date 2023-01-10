@@ -1,20 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:trip_planner/implementation_cards/models/contact.dart';
+import 'package:trip_planner/models/specific_line.dart';
+import 'package:trip_planner/providers/position_provider.dart';
+import 'package:trip_planner/views/map_view_copy.dart';
 
-class ContactCard extends StatelessWidget {
-  const ContactCard({
-    super.key,
+class MicrosCard extends StatelessWidget {
+  MicrosCard({
     required this.borderColor,
     required this.contact,
+    required this.micros,
+    required this.distances,
+    this.dataComplete = false,
+    this.index,
   });
 
   final Color borderColor;
   final Contact contact;
+  SpecificLine micros;
+  double distances;
+  bool dataComplete;
+  int? index;
 
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: contact.name,
+      tag: micros.code,
       child: Material(
         color: Colors.transparent,
         child: Column(
@@ -73,18 +85,19 @@ class ContactCard extends StatelessWidget {
                       //---------------------------
                       Row(
                         children: [
-                          const Icon(
-                            Icons.person_outlined,
+                          const FaIcon(
+                            FontAwesomeIcons.bus,
+                            color: Colors.blueAccent,
                             size: 40,
                           ),
                           const SizedBox(width: 10),
                           Flexible(
                             child: Text.rich(
                               TextSpan(
-                                text: contact.name,
+                                text: micros.code,
                                 children: [
                                   TextSpan(
-                                    text: '\n${contact.role}',
+                                    text: '\n' + micros.descripcionLinea,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.normal,
@@ -107,15 +120,19 @@ class ContactCard extends StatelessWidget {
                       Row(
                         children: [
                           const Icon(
-                            Icons.home_outlined,
+                            Icons.description,
                             size: 40,
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            contact.address,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.deepPurple,
+                          SizedBox(
+                            width: 250,
+                            child: Text(
+                              micros.descripcionMicro,
+                              maxLines: 4,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.deepPurple,
+                              ),
                             ),
                           )
                         ],
@@ -125,13 +142,14 @@ class ContactCard extends StatelessWidget {
                       //---------------------------
                       Row(
                         children: [
-                          const Icon(
-                            Icons.phone_outlined,
+                          FaIcon(
+                            FontAwesomeIcons.phone,
                             size: 40,
+                            color: Colors.green[500],
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            contact.phone,
+                            micros.telefono,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -144,9 +162,10 @@ class ContactCard extends StatelessWidget {
                       //---------------------------
                       Row(
                         children: [
-                          const Icon(
-                            Icons.email_outlined,
+                          FaIcon(
+                            FontAwesomeIcons.ruler,
                             size: 40,
+                            color: Colors.yellow[900],
                           ),
                           const SizedBox(width: 10),
                           Flexible(
@@ -156,7 +175,7 @@ class ContactCard extends StatelessWidget {
                                 FittedBox(
                                   fit: BoxFit.scaleDown,
                                   child: Text(
-                                    contact.email,
+                                    micros.velocidad.toString() + " Km/h",
                                     style: const TextStyle(
                                       fontSize: 16,
                                       color: Colors.deepPurple,
@@ -164,7 +183,17 @@ class ContactCard extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  contact.website,
+                                  (distances / 1000).toStringAsFixed(3) +
+                                      ' Km.',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.deepPurple,
+                                  ),
+                                ),
+                                Text(
+                                  (((distances / 1000) / micros.velocidad) * 60)
+                                          .toStringAsFixed(3) +
+                                      ' min.',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Colors.deepPurple,
@@ -175,6 +204,75 @@ class ContactCard extends StatelessWidget {
                           )
                         ],
                       ),
+                      (dataComplete)
+                          ? Column(
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 20),
+                                  child: Center(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(15),
+                                      child: Image.asset(
+                                        micros.foto,
+                                        width: 150,
+                                        height: 150,
+                                        scale: 10,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 250,
+                                  height: 60,
+                                  // padding: EdgeInsets.symmetric(vertical: 10),
+                                  // margin:
+                                  //     EdgeInsets.only(top: 450, right: 100, left: 100),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green[900],
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      topRight: Radius.circular(10),
+                                      bottomLeft: Radius.circular(10),
+                                      bottomRight: Radius.circular(10),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 7,
+                                        offset: Offset(
+                                            0, 3), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: ListTile(
+                                    title: const Text(
+                                      "Trazar Ruta",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                    trailing: Icon(
+                                      Icons.visibility,
+                                      color: Colors.white,
+                                    ),
+                                    onTap: () {
+                                      final positionProvider =
+                                          Provider.of<PositionProvider>(context, listen: false);
+
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) => MapView(
+                                                  0, 99, positionProvider.startPosition, positionProvider.endPosition, null)));
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )
+                          : SizedBox.shrink(),
                     ],
                   ),
                 ),
