@@ -58,7 +58,7 @@ class MicrosListPageState extends State<MicrosListPage> {
         child: PerspectiveListView(
           visualizedItems: _visibleItems,
           itemExtent: 330,
-          initialIndex: 5,
+          initialIndex: widget.micros.length - 1,
           enableBackItemsShadow: true,
           backItemsShadowColor: Theme.of(context).scaffoldBackgroundColor,
           padding: const EdgeInsets.all(10),
@@ -71,7 +71,8 @@ class MicrosListPageState extends State<MicrosListPage> {
                   contact: Contact.contacts[index],
                   color: color,
                   micro: widget.micros[widget.micros.length - index - 1],
-                  distance: widget.distances[widget.micros.length - index - 1],
+                  distance:
+                      widget.distances[widget.distances.length - index - 1],
                 ),
               ),
             );

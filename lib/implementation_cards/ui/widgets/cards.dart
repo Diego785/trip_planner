@@ -260,13 +260,20 @@ class MicrosCard extends StatelessWidget {
                                     ),
                                     onTap: () {
                                       final positionProvider =
-                                          Provider.of<PositionProvider>(context, listen: false);
-
+                                          Provider.of<PositionProvider>(context,
+                                              listen: false);
+                                      positionProvider.recorridoSelected =
+                                          micros.id;
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (_) => MapView(
-                                                  0, 99, positionProvider.startPosition, positionProvider.endPosition, null)));
+                                                  0,
+                                                  99,
+                                                  positionProvider
+                                                      .startPosition,
+                                                  positionProvider.endPosition,
+                                                  null)));
                                     },
                                   ),
                                 ),

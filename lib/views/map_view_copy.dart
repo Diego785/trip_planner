@@ -106,6 +106,9 @@ class _MapViewState extends State<MapView> {
   double endPointLongi = 0;
   double endPointLati = 0;
 
+  List<PuntosModel> rutaSelected = [];
+  List<LatLng> listaRutaSelected = [];
+
   var recorridos = 0;
   var origens = null;
   var destinos = null;
@@ -136,13 +139,6 @@ class _MapViewState extends State<MapView> {
         Provider.of<PuntosProvider>(context, listen: false)
             .setPunto(recorrido, parImpar);
       } else {
-        PuntosService.getPuntos(recorrido, 1).then((puntos) {
-          setState(() {
-            _puntos = puntos;
-            latlng = listaLatLng(_puntos);
-            loadData();
-          });
-        });
         Provider.of<PuntosProvider>(context, listen: false)
             .setPunto(recorrido, 1);
         PuntosService.getPuntos(recorrido, 2).then((puntos) {
@@ -291,7 +287,7 @@ class _MapViewState extends State<MapView> {
   List<int> purgarMicros(List<int> micros) {
     List<int> microsPurgados = [];
 
-    for (var i = 1; i <= micros.length - 1; i++) {
+    for (var i = 1; i < micros.length; i++) {
       if (micros[i] != micros[i - 1]) {
         microsPurgados.add(micros[i - 1]);
       }
@@ -312,7 +308,7 @@ class _MapViewState extends State<MapView> {
     int parController = 0;
     double distance = 0;
 
-    for (int i = 0; i <= recorridos.length - 1; i++) {
+    for (int i = 0; i < recorridos.length; i++) {
       if (recorridos[i] % 2 != 0) {
         parController = 1;
         recorridoController = ((recorridos[i] + 1) / 2).truncate();
@@ -349,25 +345,15 @@ class _MapViewState extends State<MapView> {
                       endPointLongi) <
                   300 &&
               bandera) {
-            if (Geolocator.distanceBetween(
-                    double.parse(puntos[i + 1].lati),
-                    double.parse(puntos[i + 1].longi),
-                    endPointLati,
-                    endPointLongi) >
-                Geolocator.distanceBetween(
-                    double.parse(puntos[i].lati),
-                    double.parse(puntos[i].longi),
-                    endPointLati,
-                    endPointLongi)) {
-              microsOneRoute.add(puntos[i].recorridoId);
-              distances.add(distance);
-              bandera = false;
-            }
+            microsOneRoute.add(puntos[i].recorridoId);
+            distances.add(distance);
+            bandera = false;
           }
         }
       });
     }
 
+    print(microsOneRoute);
     nearestMicrosOrigen.clear();
 //ALGORITMO PARA ORDENAR LOS MICROS QUE HACEN MENOS RECORRIDO DESDE EL PUNTO DE ORIGEN AL PUNTO DE DESTINO
     for (int i = 0; i < distances.length; i++) {
@@ -446,8 +432,9 @@ class _MapViewState extends State<MapView> {
 // ENCUENTRA LAS APROXIMACIONES, VERIFICA SI UN MICRO PASA POR DOS PUNTOS, CREA LOS MARCADORES Y LA POLYLINE
   loadData4() async {
     print("Entró al loadData4");
-    // final positionProvider =
-    //   Provider.of<PositionProvider>(context, listen: false);
+
+    final positionProvider =
+        Provider.of<PositionProvider>(context, listen: false);
     int fid1 = 0;
     int fid2 = 0;
 
@@ -498,6 +485,10 @@ class _MapViewState extends State<MapView> {
 
     await verifOneRouteAndOrderOptimum(nearestMicrosOrigen);
     print(nearestMicrosOrigen);
+    // nearestMicrosOrigen.insert(0, 0);
+    // distanceOneRoute.insert(0, 0);
+    // nearestMicrosOrigen = nearestMicrosOrigen.sublist(1, 6);
+    // distanceOneRoute = distanceOneRoute.sublist(1, 6);
 
 // // POR SI UN MICRO PASA POR LOS DOS PUNTOS
 //     int recorridoController = 0;
@@ -635,6 +626,88 @@ class _MapViewState extends State<MapView> {
       microLinea.forEach((element) {
         print(element.toJson());
       });
+
+      /*if (microLinea.length == 1) {
+        positionProvider.recorridoSelected = microLinea.first.id;
+        int? recorrido = 0;
+        int? par = 0;
+        if (positionProvider.recorridoSelected!.toDouble() % 2 == 0) {
+          recorrido = (positionProvider.recorridoSelected! / 2).toInt();
+          par = 2;
+        } else {
+          recorrido = ((positionProvider.recorridoSelected! + 1) / 2).toInt();
+          par = 1;
+        }
+
+        int indexIni = -1;
+        int indexFinal = -1;
+
+        await PuntosService.getPuntos(recorrido, par).then((puntos) {
+          setState(() {
+            rutaSelected = puntos;
+          });
+        });
+
+        print(rutaSelected);
+
+        for (var i = 0; i < rutaSelected.length; i++) {
+          if ((Geolocator.distanceBetween(
+                      double.parse(rutaSelected[i].lati),
+                      double.parse(rutaSelected[i].longi),
+                      startPointLati,
+                      startPointLongi) <
+                  300) &&
+              (Geolocator.distanceBetween(
+                      double.parse(rutaSelected[i].lati),
+                      double.parse(rutaSelected[i].longi),
+                      startPointLati,
+                      startPointLongi) <
+                  Geolocator.distanceBetween(
+                      double.parse(rutaSelected[i + 1].lati),
+                      double.parse(rutaSelected[i + 1].longi),
+                      startPointLati,
+                      startPointLongi)) &&
+              indexIni == -1) {
+            indexIni = i;
+          }
+          if ((Geolocator.distanceBetween(
+                      double.parse(rutaSelected[i].lati),
+                      double.parse(rutaSelected[i].longi),
+                      endPointLati,
+                      endPointLongi) <
+                  300) &&
+              (Geolocator.distanceBetween(
+                      double.parse(rutaSelected[i].lati),
+                      double.parse(rutaSelected[i].longi),
+                      endPointLati,
+                      endPointLongi) <
+                  Geolocator.distanceBetween(
+                      double.parse(rutaSelected[i + 1].lati),
+                      double.parse(rutaSelected[i + 1].longi),
+                      endPointLati,
+                      endPointLongi)) &&
+              indexFinal == -1) {
+            indexFinal = i;
+          }
+        }
+
+        setState(() {
+          rutaSelected = rutaSelected.sublist(indexIni, indexFinal);
+          listaRutaSelected = listaLatLng(rutaSelected);
+        });
+        print(rutaSelected);
+        for (int i = 0; i < listaRutaSelected.length; i++) {
+          setState(() {});
+          _polyline.add(Polyline(
+              polylineId: PolylineId('9'),
+              points: listaRutaSelected,
+              color: Colors.green,
+              width: 7,
+              startCap: Cap.roundCap,
+              endCap: Cap.roundCap));
+        }
+      }*/
+
       setState(() {
         loadingScreen = false;
       });
@@ -773,21 +846,96 @@ class _MapViewState extends State<MapView> {
               newPosition4.longitude.toString());
         }));*/
     _markers2.add(Marker(
-        markerId: const MarkerId('end'),
+        markerId: const MarkerId('start'),
         position: LatLng(endPointLati, endPointLongi),
         infoWindow: const InfoWindow(
           title: 'Destino',
         ),
         icon: BitmapDescriptor.fromBytes(markerIcon),
         draggable: true,
-        onDragEnd: (newPosition2) {
+        onDragEnd: (newPosition1) {
           // posicion1 = newPosition1;
-          endPointLati = newPosition2.latitude;
-          endPointLongi = newPosition2.longitude;
-          print('Segundo');
-          print(newPosition2.latitude.toString() +
-              newPosition2.longitude.toString());
+          endPointLati = newPosition1.latitude;
+          endPointLongi = newPosition1.longitude;
         }));
+
+    int? recorrido = 0;
+    int? par = 0;
+    if (positionProvider.recorridoSelected!.toDouble() % 2 == 0) {
+      recorrido = (positionProvider.recorridoSelected! / 2).toInt();
+      par = 2;
+    } else {
+      recorrido = ((positionProvider.recorridoSelected! + 1) / 2).toInt();
+      par = 1;
+    }
+
+    int indexIni = -1;
+    int indexFinal = -1;
+
+    await PuntosService.getPuntos(recorrido, par).then((puntos) {
+      setState(() {
+        rutaSelected = puntos;
+      });
+    });
+
+    print(rutaSelected);
+
+    for (var i = 0; i < rutaSelected.length; i++) {
+      if ((Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i].lati),
+                  double.parse(rutaSelected[i].longi),
+                  startPointLati,
+                  startPointLongi) <
+              300) &&
+          (Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i].lati),
+                  double.parse(rutaSelected[i].longi),
+                  startPointLati,
+                  startPointLongi) <
+              Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i + 1].lati),
+                  double.parse(rutaSelected[i + 1].longi),
+                  startPointLati,
+                  startPointLongi)) &&
+          indexIni == -1) {
+        indexIni = i;
+      }
+      if ((Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i].lati),
+                  double.parse(rutaSelected[i].longi),
+                  endPointLati,
+                  endPointLongi) <
+              300) &&
+          (Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i].lati),
+                  double.parse(rutaSelected[i].longi),
+                  endPointLati,
+                  endPointLongi) <
+              Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i + 1].lati),
+                  double.parse(rutaSelected[i + 1].longi),
+                  endPointLati,
+                  endPointLongi)) &&
+          indexFinal == -1) {
+        indexFinal = i;
+      }
+    }
+
+    setState(() {
+      rutaSelected = rutaSelected.sublist(indexIni, indexFinal);
+      listaRutaSelected = listaLatLng(rutaSelected);
+    });
+    print(rutaSelected);
+    for (int i = 0; i < listaRutaSelected.length; i++) {
+      setState(() {});
+      _polyline.add(Polyline(
+          polylineId: PolylineId('9'),
+          points: listaRutaSelected,
+          color: Colors.green,
+          width: 7,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap));
+    }
 
     setState(() {
       loadingScreen = false;
@@ -1082,244 +1230,258 @@ class _MapViewState extends State<MapView> {
       );
     } else if (origens != null) {
       //Buscador
-      return SizedBox(
-        width: size.width,
-        height: size.height,
-        child: (_markers2.isEmpty || loadingScreen == true)
-            ? const LoadingPage2()
-            : Stack(
-                children: [
-                  GoogleMap(
-                    initialCameraPosition: _kGooglePlex,
-                    markers: _markers2,
-                    compassEnabled: false,
-                    myLocationEnabled: true,
-                    zoomControlsEnabled: false,
-                    myLocationButtonEnabled: false,
-                    polylines: _polyline,
-                    onMapCreated: (controller) =>
-                        mapBloc.add(OnMapInitialzedEvent(controller)),
-                  ),
-                  (microLinea.isNotEmpty)
-                      ? Stack(
-                          children: [
-                            Container(
-                              width: 800,
-                              height: 130,
-                              padding: EdgeInsets.symmetric(vertical: 5),
-                              margin:
-                                  EdgeInsets.only(top: 50, right: 50, left: 50),
-                              decoration: BoxDecoration(
-                                color: Colors.green[900],
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: Offset(
-                                        0, 3), // changes position of shadow
+      return Material(
+        child: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: (_markers2.isEmpty || loadingScreen == true)
+              ? const LoadingPage2()
+              : Stack(
+                  children: [
+                    GoogleMap(
+                      initialCameraPosition: _kGooglePlex,
+                      markers: _markers2,
+                      compassEnabled: false,
+                      myLocationEnabled: true,
+                      zoomControlsEnabled: false,
+                      myLocationButtonEnabled: false,
+                      polylines: _polyline,
+                      onMapCreated: (controller) =>
+                          mapBloc.add(OnMapInitialzedEvent(controller)),
+                    ),
+                    /*(microLinea.length < 5 && microLinea.isNotEmpty)
+                        ? Stack(
+                            children: [
+                              Container(
+                                width: 800,
+                                height: 130,
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                                margin: EdgeInsets.only(
+                                    top: 50, right: 50, left: 50),
+                                decoration: BoxDecoration(
+                                  color: Colors.green[900],
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10),
+                                    bottomRight: Radius.circular(10),
                                   ),
-                                ],
-                              ),
-                              child: ListView.builder(
-                                  itemCount: microLinea.length,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      title: Row(
-                                        children: [
-                                          Text(
-                                            "Línea: ",
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            microLinea[index].code,
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Distancia: ",
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Tiempo: ",
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Velocidad: ",
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                microLinea.first.velocidad
-                                                        .toString() +
-                                                    " Km/h",
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              ),
-                                            ],
-                                          ),
-
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Información: ",
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                microLinea.first.telefono,
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            width: 150,
-                                            child: Text(
-                                              microLinea
-                                                      .first.descripcionMicro +
-                                                  ". " +
-                                                  microLinea
-                                                      .first.descripcionLinea,
-                                              maxLines: 4,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 5,
+                                      blurRadius: 7,
+                                      offset: Offset(
+                                          0, 3), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: ListView.builder(
+                                    itemCount: microLinea.length,
+                                    itemBuilder: (context, index) {
+                                      return ListTile(
+                                        title: Row(
+                                          children: [
+                                            Text(
+                                              "Línea: ",
                                               style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.white,
-                                                  fontStyle: FontStyle.italic),
+                                                fontSize: 15,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-
-                                          // Text(
-                                          //   "Descripción de la Línea: " + microLinea.first.descripcionLinea,
-                                          //   style: TextStyle(
-                                          //       fontSize: 10,
-                                          //       color: Colors.white,
-                                          //       fontStyle: FontStyle.italic),
-                                          // ),
-                                        ],
-                                      ),
-                                      leading: ClipRRect(
-                                        borderRadius: BorderRadius.circular(90),
-                                        child: Image.asset(
-                                          microLinea.first.foto,
-                                          width: 100,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                          scale: 10,
+                                            Text(
+                                              microLinea[index].code,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      // trailing: Icon(
-                                      //   Icons.visibility,
-                                      //   color: Colors.white,
-                                      // ),
-                                    );
-                                  }),
-                            ),
-                          ],
-                        )
-                      : Container(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          margin:
-                              EdgeInsets.only(top: 550, right: 100, left: 100),
-                          decoration: BoxDecoration(
-                            color: Colors.green[900],
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset:
-                                    Offset(0, 3), // changes position of shadow
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "Distancia: ",
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "Tiempo: ",
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "Velocidad: ",
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  microLinea.first.velocidad
+                                                          .toString() +
+                                                      " Km/h",
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.white,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                ),
+                                              ],
+                                            ),
+
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "Información: ",
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  microLinea.first.telefono,
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.white,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              width: 150,
+                                              child: Text(
+                                                microLinea.first
+                                                        .descripcionMicro +
+                                                    ". " +
+                                                    microLinea
+                                                        .first.descripcionLinea,
+                                                maxLines: 4,
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.white,
+                                                    fontStyle:
+                                                        FontStyle.italic),
+                                              ),
+                                            ),
+
+                                            // Text(
+                                            //   "Descripción de la Línea: " + microLinea.first.descripcionLinea,
+                                            //   style: TextStyle(
+                                            //       fontSize: 10,
+                                            //       color: Colors.white,
+                                            //       fontStyle: FontStyle.italic),
+                                            // ),
+                                          ],
+                                        ),
+                                        leading: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(90),
+                                          child: Image.asset(
+                                            microLinea.first.foto,
+                                            width: 100,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                            scale: 10,
+                                          ),
+                                        ),
+                                        // trailing: Icon(
+                                        //   Icons.visibility,
+                                        //   color: Colors.white,
+                                        // ),
+                                      );
+                                    }),
                               ),
                             ],
-                          ),
-                          child: ListTile(
-                            title: const Text(
-                              "Ver Sugerencias",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                  fontStyle: FontStyle.italic),
-                            ),
-                            trailing: Icon(
-                              Icons.visibility,
-                              color: Colors.white,
-                            ),
-                            onTap: () async {
-                              final positionProvider =
-                                  Provider.of<PositionProvider>(context,
-                                      listen: false);
-                              positionProvider.startPosition = origens;
-                              positionProvider.endPosition = destinos;
-
-                              loadingScreen = true;
-                              await loadData4();
-                              setState(() {});
-
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => MicrosListPage(
-                                          microLinea, distanceOneRoute)));
-                            },
-                          ),
+                          )
+                        :*/
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      margin: EdgeInsets.only(top: 550, right: 100, left: 100),
+                      decoration: BoxDecoration(
+                        color: Colors.green[900],
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
                         ),
-                ],
-              ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: Offset(0, 3), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      child: ListTile(
+                        title: const Text(
+                          "Ver Sugerencias",
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontStyle: FontStyle.italic),
+                        ),
+                        trailing: Icon(
+                          Icons.visibility,
+                          color: Colors.white,
+                        ),
+                        onTap: () async {
+                          setState(() {
+                            loadingScreen = true;
+                          });
+                          final positionProvider =
+                              Provider.of<PositionProvider>(context,
+                                  listen: false);
+                          positionProvider.startPosition = origens;
+                          positionProvider.endPosition = destinos;
+
+                          if (positionProvider.recorridoSelected == 0) {
+                            await loadData4();
+                          }
+                          if (positionProvider.recorridoSelected == 0) {
+                            positionProvider.micros = microLinea;
+                            positionProvider.distances = distanceOneRoute;
+                          } else {
+                            microLinea = positionProvider.micros;
+                            distanceOneRoute = positionProvider.distances;
+                          }
+                          setState(() {});
+
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => MicrosListPage(
+                                      microLinea, distanceOneRoute)));
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       );
     } else {
       //Normal
