@@ -70,7 +70,7 @@ class MicrosListPageState extends State<MicrosListPage> {
                 builder: (_) => ContactDetailScreen(
                   contact: Contact.contacts[index],
                   color: color,
-                  micro: widget.micros[widget.micros.length - index - 1],
+                  micro: widget.micros[index],
                   distance:
                       widget.distances[widget.distances.length - index - 1],
                 ),
@@ -80,7 +80,7 @@ class MicrosListPageState extends State<MicrosListPage> {
           children: List.generate(widget.micros.length, (index) {
             final borderColor = Colors.accents[index % Colors.accents.length];
             final contact = Contact.contacts[index];
-            final micros = widget.micros[widget.micros.length - index - 1];
+            final micros = widget.micros[index];
             final distances =
                 widget.distances[widget.distances.length - index - 1];
             return MicrosCard(

@@ -23,6 +23,8 @@ import 'package:trip_planner/services/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_place/google_place.dart';
 import 'package:trip_planner/models/specific_line.dart';
+import 'package:trip_planner/widgets/btnPrin.dart';
+import 'package:trip_planner/widgets/btn_location.dart';
 
 class MapView extends StatefulWidget {
   final int recorrido;
@@ -154,10 +156,16 @@ class _MapViewState extends State<MapView> {
     }
     if (origen != null) {
       setState(() {
-        startPointLati = widget.startPosition!.geometry!.location!.lat!;
-        startPointLongi = widget.startPosition!.geometry!.location!.lng!;
-        endPointLati = widget.endPosition!.geometry!.location!.lat!;
-        endPointLongi = widget.endPosition!.geometry!.location!.lng!;
+        if (positionProvider.recorridosShowed == false) {
+          positionProvider.startPositionLati =
+              widget.startPosition!.geometry!.location!.lat!;
+          positionProvider.startPositionLongi =
+              widget.startPosition!.geometry!.location!.lng!;
+          positionProvider.endPositionLati =
+              widget.endPosition!.geometry!.location!.lat!;
+          positionProvider.endPositionLongi =
+              widget.endPosition!.geometry!.location!.lng!;
+        }
         if (widget.recorrido == 0 && widget.par != 99) {
           loadData3();
         } else {
@@ -175,104 +183,6 @@ class _MapViewState extends State<MapView> {
       destinos = destino;
     });
   }
-/*
-//RECORTA LA LISTA DE PUNTOS POR DONDE PASA EL MICRO DE ORIGEN, SIEMPRE Y CUANDO PASE TAMBIÉN POR EL DESTINO. CREA UNA LISTA DESDE EL PUNTO DE ORIGEN AL PUNTO DE DESTINO.
-  List<PuntosModel>? findRouteNearStart(List<PuntosModel> puntos,
-      LatLng nearestPointStart, double endPointLati, double endPointLongi) {
-    List<PuntosModel>? lista;
-    double latiPosFinal = 0;
-    double longiPosFinal = 0;
-
-    int indexIni = puntos.indexWhere((element) =>
-        double.parse(element.lati) == nearestPointStart.latitude &&
-        double.parse(element.longi) == nearestPointStart.longitude);
-
-    print("PUNTO MÁS CERCANO AL INICIO: $nearestPointStart");
-    int indexFinal = 0;
-    int count = 0;
-    double minimunDistance = 999999.9;
-    puntos.forEach((element) {
-      if (Geolocator.distanceBetween(double.parse(element.lati),
-              double.parse(element.longi), endPointLati, endPointLongi) <
-          minimunDistance) {
-        minimunDistance = Geolocator.distanceBetween(double.parse(element.lati),
-            double.parse(element.longi), endPointLati, endPointLongi);
-        //indexFinal = count; // CHECK THIS
-
-        print(element.lati);
-        print(element.longi);
-        latiPosFinal = double.parse(element.lati);
-        longiPosFinal = double.parse(element.longi);
-        print("COUNT: $count");
-        print(
-            "MINIMUN DISTANCE IN THE FIRST MICRO CROSSING THE DESTINY POINT: $minimunDistance");
-      }
-      count++;
-    });
-
-    indexFinal = puntos.indexWhere((element) =>
-        double.parse(element.lati) == latiPosFinal &&
-        double.parse(element.longi) == longiPosFinal);
-
-    print(latiPosFinal);
-    print('INDEX FINAL: $indexFinal');
-
-    if (indexIni < indexFinal) {
-      lista = puntos.sublist(indexIni, indexFinal);
-    } else {
-      lista = puntos.sublist(indexFinal, indexIni);
-    }
-
-    print(nearestPointStart);
-    print("INITIAL POSTION IN THE INITIAL ROUTE: " + indexIni.toString());
-
-    return (minimunDistance < 500) ? lista : null;
-  }
-
-//RECORTA LA LISTA DE PUNTOS POR DONDE PASA EL MICRO DE DESTINO, SIEMPRE Y CUANDO PASE TAMBIÉN POR EL ORIGEN. CREA UNA LISTA DESDE EL PUNTO DE ORIGEN AL PUNTO DE DESTINO.
-  List<PuntosModel>? findRouteNearEnd(List<PuntosModel> puntos,
-      LatLng nearestPointEnd, double startPointLati, double startPointLongi) {
-    List<PuntosModel>? lista;
-    double latiPosIni = 0;
-    double longiPosIni = 0;
-
-    int indexFinal = puntos.indexWhere((element) =>
-        double.parse(element.lati) == nearestPointEnd.latitude &&
-        double.parse(element.longi) == nearestPointEnd.longitude);
-
-    int indexIni = 0;
-    int count = 0;
-
-    double minimunDistance = 9999.9;
-    puntos.forEach((element) {
-      if (Geolocator.distanceBetween(double.parse(element.lati),
-              double.parse(element.longi), startPointLati, startPointLongi) <
-          minimunDistance) {
-        minimunDistance = Geolocator.distanceBetween(double.parse(element.lati),
-            double.parse(element.longi), startPointLati, startPointLongi);
-        latiPosIni = double.parse(element.lati);
-        longiPosIni = double.parse(element.longi);
-        //indexIni = count;
-        print(
-            "MINIMUN DISTANCE IN THE FINAL MCIRO CROSSING THE INITIAL POINT: $minimunDistance");
-      }
-      count++;
-    });
-
-    indexIni = puntos.indexWhere((element) =>
-        double.parse(element.lati) == latiPosIni &&
-        double.parse(element.longi) == longiPosIni);
-    if (indexIni < indexFinal) {
-      lista = puntos.sublist(indexIni, indexFinal);
-    } else {
-      lista = puntos.sublist(indexFinal, indexIni);
-    }
-
-    print(nearestPointEnd);
-    print("INITIAL POSITION IN THE ENDING ROUTE: " + indexFinal.toString());
-
-    return (minimunDistance < 500) ? lista : null;
-  }*/
 
   bool verifMicroRoute(List<int> micros, int recorridoId) {
     for (var i = 0; i < micros.length - 1; i++) {
@@ -308,6 +218,9 @@ class _MapViewState extends State<MapView> {
     int parController = 0;
     double distance = 0;
 
+    final positionProvider =
+        Provider.of<PositionProvider>(context, listen: false);
+
     for (int i = 0; i < recorridos.length; i++) {
       if (recorridos[i] % 2 != 0) {
         parController = 1;
@@ -324,8 +237,8 @@ class _MapViewState extends State<MapView> {
           if (Geolocator.distanceBetween(
                   double.parse(puntos[i].lati),
                   double.parse(puntos[i].longi),
-                  startPointLati,
-                  startPointLongi) <
+                  positionProvider.startPositionLati,
+                  positionProvider.startPositionLongi) <
               300) {
             bandera = true;
           }
@@ -341,8 +254,8 @@ class _MapViewState extends State<MapView> {
           if (Geolocator.distanceBetween(
                       double.parse(puntos[i].lati),
                       double.parse(puntos[i].longi),
-                      endPointLati,
-                      endPointLongi) <
+                      positionProvider.endPositionLati,
+                      positionProvider.endPositionLongi) <
                   300 &&
               bandera) {
             microsOneRoute.add(puntos[i].recorridoId);
@@ -392,28 +305,26 @@ class _MapViewState extends State<MapView> {
 
     _markers2.add(Marker(
         markerId: const MarkerId('start'),
-        position: (startPointLati != 0 && startPointLongi != 0)
-            ? LatLng(startPointLati, startPointLongi)
-            : LatLng(widget.startPosition!.geometry!.location!.lat!,
-                widget.startPosition!.geometry!.location!.lng!),
+        position: LatLng(widget.startPosition!.geometry!.location!.lat!,
+            widget.startPosition!.geometry!.location!.lng!),
         infoWindow: const InfoWindow(
           title: 'Origen',
         ),
         draggable: true,
         onDragEnd: (newPosition1) {
           // posicion1 = newPosition1;
-          startPointLati = newPosition1.latitude;
-          startPointLongi = newPosition1.longitude;
-          print('Primero');
-          print(newPosition1.latitude.toString() +
-              newPosition1.longitude.toString());
+          setState(() {
+            positionProvider.startPositionLati = newPosition1.latitude;
+            positionProvider.startPositionLongi = newPosition1.longitude;
+            print('Primero');
+            positionProvider.recorridoSelected = 0;
+            positionProvider.recorridosShowed = false;
+          });
         }));
     _markers2.add(Marker(
         markerId: const MarkerId('end'),
-        position: (endPointLati != 0 && endPointLongi != 0)
-            ? LatLng(endPointLati, endPointLongi)
-            : LatLng(widget.endPosition!.geometry!.location!.lat!,
-                widget.endPosition!.geometry!.location!.lng!),
+        position: LatLng(widget.endPosition!.geometry!.location!.lat!,
+            widget.endPosition!.geometry!.location!.lng!),
         infoWindow: const InfoWindow(
           title: 'Destino',
         ),
@@ -421,11 +332,13 @@ class _MapViewState extends State<MapView> {
         draggable: true,
         onDragEnd: (newPosition2) {
           // posicion1 = newPosition1;
-          endPointLati = newPosition2.latitude;
-          endPointLongi = newPosition2.longitude;
-          print('Segundo');
-          print(newPosition2.latitude.toString() +
-              newPosition2.longitude.toString());
+          setState(() {
+            positionProvider.endPositionLati = newPosition2.latitude;
+            positionProvider.endPositionLongi = newPosition2.longitude;
+            print('Segundo');
+            positionProvider.recorridoSelected = 0;
+            positionProvider.recorridosShowed = false;
+          });
         }));
   }
 
@@ -445,32 +358,42 @@ class _MapViewState extends State<MapView> {
     // LatLng nearestPointStartOneBus = LatLng(0, 0);
     // LatLng nearestPointEndOneBus = LatLng(0, 0);
 
-    if (startPointLati == 0) {
-      startPointLati = widget.startPosition!.geometry!.location!.lat!;
+    if (positionProvider.startPositionLati == 0) {
+      positionProvider.startPositionLati =
+          widget.startPosition!.geometry!.location!.lat!;
     }
-    if (startPointLongi == 0) {
-      startPointLongi = widget.startPosition!.geometry!.location!.lng!;
+    if (positionProvider.startPositionLongi == 0) {
+      positionProvider.startPositionLongi =
+          widget.startPosition!.geometry!.location!.lng!;
     }
-    if (endPointLati == 0) {
-      endPointLati = widget.endPosition!.geometry!.location!.lat!;
+    if (positionProvider.endPositionLati == 0.0) {
+      positionProvider.endPositionLati =
+          widget.endPosition!.geometry!.location!.lat!;
     }
-    if (endPointLongi == 0) {
-      endPointLongi = widget.endPosition!.geometry!.location!.lng!;
+    if (positionProvider.endPositionLongi == 0.0) {
+      positionProvider.endPositionLongi =
+          widget.endPosition!.geometry!.location!.lng!;
     }
-
+    setState(() {});
     await PuntosService.getAllPuntos().then((puntos) {
       puntos.reversed.forEach((element) {
         print(element.recorridoId);
 
         //VERIFICA QUE LOS MICROS PASEN POR EL PUNTO DE ORIGEN
-        if ((Geolocator.distanceBetween(double.parse(element.lati),
-                double.parse(element.longi), startPointLati, startPointLongi) <
+        if ((Geolocator.distanceBetween(
+                double.parse(element.lati),
+                double.parse(element.longi),
+                positionProvider.startPositionLati,
+                positionProvider.startPositionLongi) <
             300)) {
           nearestMicrosOrigen.add(element.recorridoId);
           fid1 = element.id;
         }
-        if ((Geolocator.distanceBetween(double.parse(element.lati),
-                double.parse(element.longi), endPointLati, endPointLongi) <
+        if ((Geolocator.distanceBetween(
+                double.parse(element.lati),
+                double.parse(element.longi),
+                positionProvider.endPositionLati,
+                positionProvider.endPositionLongi) <
             300)) {
           nearestMicrosDestiny.add(element.recorridoId);
           fid1 = element.id;
@@ -485,62 +408,6 @@ class _MapViewState extends State<MapView> {
 
     await verifOneRouteAndOrderOptimum(nearestMicrosOrigen);
     print(nearestMicrosOrigen);
-    // nearestMicrosOrigen.insert(0, 0);
-    // distanceOneRoute.insert(0, 0);
-    // nearestMicrosOrigen = nearestMicrosOrigen.sublist(1, 6);
-    // distanceOneRoute = distanceOneRoute.sublist(1, 6);
-
-// // POR SI UN MICRO PASA POR LOS DOS PUNTOS
-//     int recorridoController = 0;
-//     int parController = 0;
-//     if (micro % 2 != 0) {
-//       parController = 1;
-//       recorridoController = ((micro + 1) / 2).truncate();
-//     } else {
-//       parController = 2;
-//       recorridoController = (micro / 2).truncate();
-//     }
-
-//     await PuntosService.getPuntos(recorridoController, parController)
-//         .then((puntos) {
-//       _puntosStartOneRoute = findRouteNearStart(
-//           puntos, nearestPointStart, endPointLati, endPointLongi);
-//       if (_puntosStartOneRoute != null) {
-//         latlngStartOneRoute = listaLatLng(_puntosStartOneRoute!);
-//         distanceStartOneRoute = listaLatLngDistance(_puntosStartOneRoute!);
-//         distanceStartOneRoute =
-//             double.parse((distanceStartOneRoute / 1000).toStringAsFixed(2));
-//       }
-//     });
-
-//     if (microFinal % 2 != 0) {
-//       parController = 1;
-//       recorridoController = ((microFinal + 1) / 2).truncate();
-//     } else {
-//       parController = 2;
-//       recorridoController = (microFinal / 2).truncate();
-//     }
-
-//     await PuntosService.getPuntos(recorridoController, parController)
-//         .then((puntos) {
-//       setState(() {
-//         _puntosEndOneRoute = findRouteNearEnd(
-//             puntos, nearestPointEnd, startPointLati, startPointLongi);
-//         if (_puntosEndOneRoute != null) {
-//           latlngEndOneRoute = listaLatLng(_puntosEndOneRoute!);
-//           distanceEndOneRoute = listaLatLngDistance(_puntosEndOneRoute!);
-//           distanceEndOneRoute =
-//               double.parse((distanceEndOneRoute / 1000).toStringAsFixed(2));
-//         }
-//       });
-//     });
-
-//     print("El punto de partida es $startPointLati , $startPointLongi.");
-//     print("El punto de llegada es $endPointLati , $endPointLongi.");
-//     print(
-//         'El punto más cercano al punto de inicio es: ($nearestPointStart) y le pertence a la linea con el recorrido $micro');
-//     print(
-//         'El punto más cercano al punto de finalización es: ($nearestPointEnd) y le pertenece a la línea con el recorrido $microFinal');
 
     final Uint8List walking = await getBytesFromAssets(personWalking, 125);
     final Uint8List markerPoinRecomendations =
@@ -550,74 +417,36 @@ class _MapViewState extends State<MapView> {
 
     //Recommendations
     _markers2.clear();
+
     _markers2.add(Marker(
-        markerId: const MarkerId('startPointRecommendation'),
-        position: nearestPointStart,
-        infoWindow: const InfoWindow(
-          title: 'Origen Point Recommendation',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerPoinRecomendations),
-        draggable: true,
-        onDragEnd: (newPosition3) {
-          // posicion1 = newPosition1;
-          print('Primero');
-          print(newPosition3.latitude.toString() +
-              newPosition3.longitude.toString());
-        }));
-    _markers2.add(Marker(
-        markerId: const MarkerId('start'),
-        position: LatLng(startPointLati, startPointLongi),
-        infoWindow: const InfoWindow(
-          title: 'Origen',
-        ),
-        draggable: true,
-        onDragEnd: (newPosition1) {
-          // posicion1 = newPosition1;
-          startPointLati = newPosition1.latitude;
-          startPointLongi = newPosition1.longitude;
-          print('Primero');
-          print(newPosition1.latitude.toString() +
-              newPosition1.longitude.toString());
-        }));
+      markerId: const MarkerId('start2'),
+      position: LatLng(positionProvider.startPositionLati,
+          positionProvider.startPositionLongi),
+      infoWindow: const InfoWindow(
+        title: 'Origen2',
+      ),
+      draggable: true,
+    ));
 
     // _markers2.clear();
+
     _markers2.add(Marker(
-        markerId: const MarkerId('endPointRecommendation'),
-        position: nearestPointEnd,
-        infoWindow: const InfoWindow(
-          title: 'Destiny Point Recommendation',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerPoinRecomendations),
-        draggable: true,
-        onDragEnd: (newPosition4) {
-          // posicion1 = newPosition1;
-          print('Primero');
-          print(newPosition4.latitude.toString() +
-              newPosition4.longitude.toString());
-        }));
-    _markers2.add(Marker(
-        markerId: const MarkerId('end'),
-        position: LatLng(endPointLati, endPointLongi),
-        infoWindow: const InfoWindow(
-          title: 'Destino',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerIcon),
-        draggable: true,
-        onDragEnd: (newPosition2) {
-          // posicion1 = newPosition1;
-          endPointLati = newPosition2.latitude;
-          endPointLongi = newPosition2.longitude;
-          print('Segundo');
-          print(newPosition2.latitude.toString() +
-              newPosition2.longitude.toString());
-        }));
+      markerId: const MarkerId('end2'),
+      position: LatLng(
+          positionProvider.endPositionLati, positionProvider.endPositionLongi),
+      infoWindow: const InfoWindow(
+        title: 'Destino2',
+      ),
+      icon: BitmapDescriptor.fromBytes(markerIcon),
+      draggable: true,
+    ));
 
     if (nearestMicrosOrigen != null) {
       // Encuentra una sola ruta que lo lleva a destino con la lista de micros que pasa en el punto inicial.
       for (int i = 0; i < nearestMicrosOrigen.length; i++) {
         await LineServices.getMicro(nearestMicrosOrigen[i]).then((linea) {
           setState(() {
-            microLinea.add(linea.first);
+            microLinea.add(linea.last);
             //loadingScreen = false;
             // timeOneRouteStart = double.parse(((distanceStartOneRoute / microLinea.first.velocidad) * 60).toStringAsFixed(2));
           });
@@ -800,72 +629,38 @@ class _MapViewState extends State<MapView> {
     final Uint8List markerIcon = await getBytesFromAssets(images, 125);
     final Uint8List markerbus = await getBytesFromAssets(bus, 125);
 
-    //Recommendations
-    print("NUEVOS MARCADORES");
-    //_markers2.clear();
-    /*_markers2.add(Marker(
-        markerId: const MarkerId('startPointRecommendation'),
-        position: LatLng(startPointLati, startPointLongi),
-        infoWindow: const InfoWindow(
-          title: 'Origen Point Recommendation',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerPoinRecomendations),
-        draggable: true,
-        onDragEnd: (newPosition3) {
-          // posicion1 = newPosition1;
-          print('Primero');
-          print(newPosition3.latitude.toString() +
-              newPosition3.longitude.toString());
-        }));*/
+    _markers2.clear();
+
     _markers2.add(Marker(
-        markerId: const MarkerId('start'),
-        position: LatLng(startPointLati, startPointLongi),
-        infoWindow: const InfoWindow(
-          title: 'Origen',
-        ),
-        draggable: true,
-        onDragEnd: (newPosition1) {
-          // posicion1 = newPosition1;
-          startPointLati = newPosition1.latitude;
-          startPointLongi = newPosition1.longitude;
-        }));
+      markerId: const MarkerId('start3'),
+      position: LatLng(positionProvider.startPositionLati,
+          positionProvider.startPositionLongi),
+      infoWindow: const InfoWindow(
+        title: 'Origen3',
+      ),
+      draggable: true,
+    ));
 
     // _markers2.clear();
-    /*_markers2.add(Marker(
-        markerId: const MarkerId('endPointRecommendation'),
-        // position: nearestPointEnd,
-        infoWindow: const InfoWindow(
-          title: 'Destiny Point Recommendation',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerPoinRecomendations),
-        draggable: true,
-        onDragEnd: (newPosition4) {
-          // posicion1 = newPosition1;
-          print('Primero');
-          print(newPosition4.latitude.toString() +
-              newPosition4.longitude.toString());
-        }));*/
+
     _markers2.add(Marker(
-        markerId: const MarkerId('start'),
-        position: LatLng(endPointLati, endPointLongi),
-        infoWindow: const InfoWindow(
-          title: 'Destino',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerIcon),
-        draggable: true,
-        onDragEnd: (newPosition1) {
-          // posicion1 = newPosition1;
-          endPointLati = newPosition1.latitude;
-          endPointLongi = newPosition1.longitude;
-        }));
+      markerId: const MarkerId('end3'),
+      position: LatLng(
+          positionProvider.endPositionLati, positionProvider.endPositionLongi),
+      infoWindow: const InfoWindow(
+        title: 'Destino3',
+      ),
+      icon: BitmapDescriptor.fromBytes(markerIcon),
+      draggable: true,
+    ));
 
     int? recorrido = 0;
     int? par = 0;
-    if (positionProvider.recorridoSelected!.toDouble() % 2 == 0) {
-      recorrido = (positionProvider.recorridoSelected! / 2).toInt();
+    if (positionProvider.recorridoSelected.toDouble() % 2 == 0) {
+      recorrido = (positionProvider.recorridoSelected / 2).toInt();
       par = 2;
     } else {
-      recorrido = ((positionProvider.recorridoSelected! + 1) / 2).toInt();
+      recorrido = ((positionProvider.recorridoSelected + 1) / 2).toInt();
       par = 1;
     }
 
@@ -880,45 +675,52 @@ class _MapViewState extends State<MapView> {
 
     print(rutaSelected);
 
-    for (var i = 0; i < rutaSelected.length; i++) {
+    for (var i = 0; i < rutaSelected.length - 1; i++) {
       if ((Geolocator.distanceBetween(
                   double.parse(rutaSelected[i].lati),
                   double.parse(rutaSelected[i].longi),
-                  startPointLati,
-                  startPointLongi) <
+                  positionProvider.startPositionLati,
+                  positionProvider.startPositionLongi) <
               300) &&
           (Geolocator.distanceBetween(
                   double.parse(rutaSelected[i].lati),
                   double.parse(rutaSelected[i].longi),
-                  startPointLati,
-                  startPointLongi) <
-              Geolocator.distanceBetween(
+                  positionProvider.startPositionLati,
+                  positionProvider.startPositionLongi) <
+              (Geolocator.distanceBetween(
                   double.parse(rutaSelected[i + 1].lati),
                   double.parse(rutaSelected[i + 1].longi),
-                  startPointLati,
-                  startPointLongi)) &&
+                  positionProvider.startPositionLati,
+                  positionProvider.startPositionLongi))) &&
           indexIni == -1) {
         indexIni = i;
       }
       if ((Geolocator.distanceBetween(
                   double.parse(rutaSelected[i].lati),
                   double.parse(rutaSelected[i].longi),
-                  endPointLati,
-                  endPointLongi) <
+                  positionProvider.endPositionLati,
+                  positionProvider.endPositionLongi) <
               300) &&
           (Geolocator.distanceBetween(
                   double.parse(rutaSelected[i].lati),
                   double.parse(rutaSelected[i].longi),
-                  endPointLati,
-                  endPointLongi) <
-              Geolocator.distanceBetween(
+                  positionProvider.endPositionLati,
+                  positionProvider.endPositionLongi) <
+              (Geolocator.distanceBetween(
                   double.parse(rutaSelected[i + 1].lati),
                   double.parse(rutaSelected[i + 1].longi),
-                  endPointLati,
-                  endPointLongi)) &&
+                  positionProvider.endPositionLati,
+                  positionProvider.endPositionLongi))) &&
           indexFinal == -1) {
         indexFinal = i;
       }
+    }
+
+    int indexAuxi = 0;
+    if (indexFinal < indexIni) {
+      indexAuxi = indexIni;
+      indexIni = indexFinal;
+      indexFinal = indexAuxi;
     }
 
     setState(() {
@@ -1234,7 +1036,7 @@ class _MapViewState extends State<MapView> {
         child: SizedBox(
           width: size.width,
           height: size.height,
-          child: (_markers2.isEmpty || loadingScreen == true)
+          child: (loadingScreen == true)
               ? const LoadingPage2()
               : Stack(
                   children: [
@@ -1249,174 +1051,7 @@ class _MapViewState extends State<MapView> {
                       onMapCreated: (controller) =>
                           mapBloc.add(OnMapInitialzedEvent(controller)),
                     ),
-                    /*(microLinea.length < 5 && microLinea.isNotEmpty)
-                        ? Stack(
-                            children: [
-                              Container(
-                                width: 800,
-                                height: 130,
-                                padding: EdgeInsets.symmetric(vertical: 5),
-                                margin: EdgeInsets.only(
-                                    top: 50, right: 50, left: 50),
-                                decoration: BoxDecoration(
-                                  color: Colors.green[900],
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10),
-                                    bottomLeft: Radius.circular(10),
-                                    bottomRight: Radius.circular(10),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: Offset(
-                                          0, 3), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: ListView.builder(
-                                    itemCount: microLinea.length,
-                                    itemBuilder: (context, index) {
-                                      return ListTile(
-                                        title: Row(
-                                          children: [
-                                            Text(
-                                              "Línea: ",
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Text(
-                                              microLinea[index].code,
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  "Distancia: ",
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  "Tiempo: ",
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  "Velocidad: ",
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Text(
-                                                  microLinea.first.velocidad
-                                                          .toString() +
-                                                      " Km/h",
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      color: Colors.white,
-                                                      fontStyle:
-                                                          FontStyle.italic),
-                                                ),
-                                              ],
-                                            ),
-
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  "Información: ",
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Text(
-                                                  microLinea.first.telefono,
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      color: Colors.white,
-                                                      fontStyle:
-                                                          FontStyle.italic),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              width: 150,
-                                              child: Text(
-                                                microLinea.first
-                                                        .descripcionMicro +
-                                                    ". " +
-                                                    microLinea
-                                                        .first.descripcionLinea,
-                                                maxLines: 4,
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              ),
-                                            ),
-
-                                            // Text(
-                                            //   "Descripción de la Línea: " + microLinea.first.descripcionLinea,
-                                            //   style: TextStyle(
-                                            //       fontSize: 10,
-                                            //       color: Colors.white,
-                                            //       fontStyle: FontStyle.italic),
-                                            // ),
-                                          ],
-                                        ),
-                                        leading: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(90),
-                                          child: Image.asset(
-                                            microLinea.first.foto,
-                                            width: 100,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                            scale: 10,
-                                          ),
-                                        ),
-                                        // trailing: Icon(
-                                        //   Icons.visibility,
-                                        //   color: Colors.white,
-                                        // ),
-                                      );
-                                    }),
-                              ),
-                            ],
-                          )
-                        :*/
+                    
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 10),
                       margin: EdgeInsets.only(top: 550, right: 100, left: 100),
@@ -1456,27 +1091,58 @@ class _MapViewState extends State<MapView> {
                           final positionProvider =
                               Provider.of<PositionProvider>(context,
                                   listen: false);
-                          positionProvider.startPosition = origens;
-                          positionProvider.endPosition = destinos;
 
-                          if (positionProvider.recorridoSelected == 0) {
+                          if (positionProvider.recorridoSelected == 0 ||
+                              positionProvider.recorridosShowed == false) {
                             await loadData4();
-                          }
-                          if (positionProvider.recorridoSelected == 0) {
+
                             positionProvider.micros = microLinea;
                             positionProvider.distances = distanceOneRoute;
                           } else {
                             microLinea = positionProvider.micros;
                             distanceOneRoute = positionProvider.distances;
                           }
-                          setState(() {});
 
+                          positionProvider.recorridosShowed = true;
+
+                          setState(() {});
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (_) => MicrosListPage(
                                       microLinea, distanceOneRoute)));
                         },
+                      ),
+                    ),
+                    Positioned(
+                        left: MediaQuery.of(context).size.width - 68,
+                        top: MediaQuery.of(context).size.height - 195,
+                        child: SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: FloatingActionButton(
+                            heroTag: 'btnDrawerRoute',
+                            backgroundColor: Colors.green[800],
+                            onPressed: () => Scaffold.of(context).openDrawer(),
+                            child: const Icon(
+                              Icons.search,
+                            ),
+                          ),
+                        )),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 18,
+                      height: MediaQuery.of(context).size.height - 15,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: const [
+                              Btnprincipales(),
+                              BtnCurrentLocation()
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ],

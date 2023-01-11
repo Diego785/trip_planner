@@ -65,55 +65,58 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
             return const Center(child: Text('Espere por favor...'));
           }
 
-          return SingleChildScrollView(
-            child: Stack(
-              children: [
-                MapView(recorridos, pares, origen, destino,
-                    state.lastKnownLocation!),
-                //buttom para atras
-                /*Positioned(
-                  left: 15,
-                  top: 15,
-                  child: SafeArea(
-                    child: CupertinoButton(
-                      color: Colors.black26,
-                      padding: const EdgeInsets.all(10),
-                      borderRadius: BorderRadius.circular(40),
-                      child: Icon(Icons.arrow_back_outlined),
-                      onPressed: () {
-                        Navigator.pushNamed(context, 'home');
-                      },
-                    ),
-                  ),
-                ),*/
-
-                //BUSCADOR
-                //const SearchBar(),
-                Positioned(
-                    left: MediaQuery.of(context).size.width - 68,
-                    top: MediaQuery.of(context).size.height - 195,
-                    child: SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: FloatingActionButton(
-                        backgroundColor: Colors.green[800],
-                        onPressed: () => Scaffold.of(context).openDrawer(),
-                        child: const Icon(
-                          Icons.search,
-                        ),
+          return Material(
+            child: SingleChildScrollView(
+              child: Stack(
+                children: [
+                  MapView(recorridos, pares, origen, destino,
+                      state.lastKnownLocation!),
+                  //buttom para atras
+                  /*Positioned(
+                    left: 15,
+                    top: 15,
+                    child: SafeArea(
+                      child: CupertinoButton(
+                        color: Colors.black26,
+                        padding: const EdgeInsets.all(10),
+                        borderRadius: BorderRadius.circular(40),
+                        child: Icon(Icons.arrow_back_outlined),
+                        onPressed: () {
+                          Navigator.pushNamed(context, 'home');
+                        },
                       ),
-                    )),
-              ],
+                    ),
+                  ),*/
+
+                  //BUSCADOR
+                  //const SearchBar(),
+                   Positioned(
+                       left: MediaQuery.of(context).size.width - 68,
+                       top: MediaQuery.of(context).size.height - 195,
+                       child: SizedBox(
+                         height: 50,
+                         width: 50,
+                         child: FloatingActionButton(
+                           heroTag: 'btnDrawer',
+                           backgroundColor: Colors.green[800],
+                           onPressed: () => Scaffold.of(context).openDrawer(),
+                           child: const Icon(
+                             Icons.search,
+                           ),
+                         ),
+                       )),
+                ],
+              ),
             ),
           );
         },
       ),
-      // 4 BUTTOMS FLOTANTES
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: const [Btnprincipales(), BtnCurrentLocation()],
-      ),
+      // 4 BUTTONS FLOTANTES
+       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+       floatingActionButton: Column(
+         mainAxisAlignment: MainAxisAlignment.end,
+         children: const [Btnprincipales(), BtnCurrentLocation()],
+       ),
     );
   }
 }
