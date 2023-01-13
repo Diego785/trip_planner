@@ -407,10 +407,11 @@ class _MapViewState extends State<MapView> {
         loadingScreen = false;
       });
       if (nearestMicrosOrigen.isEmpty) {
+        findMicro = true;
         messageTitle = '¡Algo no funcionó correctamente!';
         messageSubtitle = 'No se encontró micro por la zona de Origen';
       } else {
-        findMicro = false;
+        findMicro = true;
         messageTitle = '¡Algo no funcionó correctamente!';
         messageSubtitle = 'No se encontró micro por la zona de Destino';
       }
@@ -424,6 +425,7 @@ class _MapViewState extends State<MapView> {
     nearestMicrosDestiny = purgarMicros(nearestMicrosDestiny);
 
     await verifOneRouteAndOrderOptimum(nearestMicrosOrigen);
+
     print(nearestMicrosOrigen);
 
     final Uint8List walking = await getBytesFromAssets(personWalking, 125);
@@ -1119,7 +1121,7 @@ class _MapViewState extends State<MapView> {
                                         false) {
                                   await loadData4();
 
-                                  if (findMicro == false) {
+                                  if (findMicro == true) {
                                     final snackBar = SnackBar(
                                       /// need to set following properties for best effect of awesome_snackbar_content
                                       elevation: 10,
@@ -1140,6 +1142,7 @@ class _MapViewState extends State<MapView> {
                                       ..showSnackBar(snackBar);
                                     return;
                                   }
+                                  findMicro = false;
 
                                   positionProvider.micros = microLinea;
                                   positionProvider.distances = distanceOneRoute;
