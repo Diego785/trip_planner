@@ -7,6 +7,7 @@ import 'package:trip_planner/pages/recorrido_lineas.dart';
 import 'package:trip_planner/providers/position_provider.dart';
 import 'package:trip_planner/providers/providers.dart';
 import 'package:trip_planner/screens/loading_screen.dart';
+import 'package:trip_planner/widgets/flash_message_screen.dart';
 import 'package:trip_planner/widgets/information_card.dart';
 
 void main() {
@@ -35,7 +36,7 @@ class MainClass extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: 'home',
         routes: {
-          'home': (_) => const LoadingScreen(),
+          'home': (_) => FlashMessageScreen(),
           // 'recorrido_lineas': (_) => RecorridoLineas()
         },
         //home: InformationCard(),
