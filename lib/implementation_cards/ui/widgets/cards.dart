@@ -25,6 +25,9 @@ class MicrosCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final positionProvider =
+        Provider.of<PositionProvider>(context, listen: false);
+    positionProvider.recorridoSelected = 99;
     return Material(
       color: Colors.transparent,
       child: Column(
@@ -181,8 +184,7 @@ class MicrosCard extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                (distances / 1000).toStringAsFixed(3) +
-                                    ' Km.',
+                                (distances / 1000).toStringAsFixed(3) + ' Km.',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   color: Colors.deepPurple,
@@ -268,8 +270,7 @@ class MicrosCard extends StatelessWidget {
                                             builder: (_) => MapView(
                                                 0,
                                                 99,
-                                                positionProvider
-                                                    .startPosition,
+                                                positionProvider.startPosition,
                                                 positionProvider.endPosition,
                                                 null)));
                                   },

@@ -1100,32 +1100,32 @@ class _MapViewState extends State<MapView> {
                               Icons.visibility,
                               color: Colors.white,
                             ),
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Container(
-                                    padding: EdgeInsets.all(16),
-                                    height: 90,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFC72C41),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Text("¡No hay micros disponibles!"),
-                                        Text(
-                                            "Intentelo nuevamente con otra línea porfavor."),
-                                      ],
-                                    ),
-                                  ),
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor: Colors.transparent,
-                                  elevation: 0,
-                                ),
-                              );
-                              /*setState(() {
+                            onTap: () async {
+                              // ScaffoldMessenger.of(context).showSnackBar(
+                              //   SnackBar(
+                              //     content: Container(
+                              //       padding: EdgeInsets.all(16),
+                              //       height: 90,
+                              //       decoration: BoxDecoration(
+                              //         color: Color(0xFFC72C41),
+                              //         borderRadius: BorderRadius.all(
+                              //           Radius.circular(20),
+                              //         ),
+                              //       ),
+                              //       child: Column(
+                              //         children: [
+                              //           Text("¡No hay micros disponibles!"),
+                              //           Text(
+                              //               "Intentelo nuevamente con otra línea porfavor."),
+                              //         ],
+                              //       ),
+                              //     ),
+                              //     behavior: SnackBarBehavior.floating,
+                              //     backgroundColor: Colors.transparent,
+                              //     elevation: 0,
+                              //   ),
+                              // );
+                              setState(() {
                                 loadingScreen = true;
                               });
                               final positionProvider =
@@ -1150,7 +1150,7 @@ class _MapViewState extends State<MapView> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (_) => MicrosListPage(
-                                          microLinea, distanceOneRoute)));*/
+                                          microLinea, distanceOneRoute)));
                             },
                           ),
                         ),
