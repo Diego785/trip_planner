@@ -36,8 +36,8 @@ class MainClass extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: 'home',
         routes: {
-          // 'home': (_) => FlashMessageScreen(),
-          'home': (_) => const LoadingScreen(),
+          'home': (_) => LoadingScreen(),
+          //'home': (_) => const LoadingScreen(),
           // 'recorrido_lineas': (_) => RecorridoLineas()
         },
         //home: InformationCard(),

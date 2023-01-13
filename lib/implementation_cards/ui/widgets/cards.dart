@@ -25,9 +25,7 @@ class MicrosCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final positionProvider =
-        Provider.of<PositionProvider>(context, listen: false);
-    positionProvider.recorridoSelected = 99;
+    
     return Material(
       color: Colors.transparent,
       child: Column(

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -102,8 +103,9 @@ class _MapViewState extends State<MapView> {
   bool trazarRuta = false;
   bool addPerson = false;
   bool loadingScreen = false;
-  bool findOrigenMicro = false;
-  String errorMessage = '';
+  bool findMicro = false;
+  String messageTitle = '';
+  String messageSubtitle = '';
 
   double startPointLongi = 0;
   double startPointLati = 0;
@@ -350,8 +352,6 @@ class _MapViewState extends State<MapView> {
 
     final positionProvider =
         Provider.of<PositionProvider>(context, listen: false);
-    int fid1 = 0;
-    int fid2 = 0;
 
     // Find the nearest points to show the recommendations
     LatLng nearestPointStart = LatLng(0, 0);
@@ -377,6 +377,7 @@ class _MapViewState extends State<MapView> {
           widget.endPosition!.geometry!.location!.lng!;
     }
     setState(() {});
+
     await PuntosService.getAllPuntos().then((puntos) {
       puntos.reversed.forEach((element) {
         print(element.recorridoId);
@@ -389,7 +390,6 @@ class _MapViewState extends State<MapView> {
                 positionProvider.startPositionLongi) <
             300)) {
           nearestMicrosOrigen.add(element.recorridoId);
-          fid1 = element.id;
         }
         if ((Geolocator.distanceBetween(
                 double.parse(element.lati),
@@ -398,20 +398,24 @@ class _MapViewState extends State<MapView> {
                 positionProvider.endPositionLongi) <
             300)) {
           nearestMicrosDestiny.add(element.recorridoId);
-          fid1 = element.id;
         }
       });
     });
 
-    if (nearestMicrosOrigen.isNotEmpty && nearestMicrosDestiny.isNotEmpty) {
-      findOrigenMicro = true;
-    } else {
-      findOrigenMicro = false;
-      if (nearestMicrosOrigen.isNotEmpty) {
-        errorMessage = 'No se encontró micro por la zona de Origen';
+    if (nearestMicrosOrigen.isEmpty || nearestMicrosDestiny.isEmpty) {
+      setState(() {
+        loadingScreen = false;
+      });
+      if (nearestMicrosOrigen.isEmpty) {
+        messageTitle = '¡Algo no funcionó correctamente!';
+        messageSubtitle = 'No se encontró micro por la zona de Origen';
       } else {
-        errorMessage = 'No se encontró micro por la zona de Destino';
+        findMicro = false;
+        messageTitle = '¡Algo no funcionó correctamente!';
+        messageSubtitle = 'No se encontró micro por la zona de Destino';
       }
+
+      return;
     }
 
     nearestMicrosOrigen = purgarMicros(
@@ -578,7 +582,7 @@ class _MapViewState extends State<MapView> {
     } else {
       // Aquí señalamos las dos rutas de los micros más próximos en cada punto, origen y destino.
 
-      await PuntosService.transbordo(fid1, fid2).then((points) {
+      /* await PuntosService.transbordo(fid1, fid2).then((points) {
         setState(() {
           _puntosStart = points;
           latlngStart = listaLatLng2(_puntosStart);
@@ -627,9 +631,11 @@ class _MapViewState extends State<MapView> {
         //   snippet: 'Linea de $lineaMicro de $camino',
         // ),
         icon: BitmapDescriptor.fromBytes(markerPoinRecomendations),
-      ));
+      ));*/
     }
   }
+
+  verifExistMicros() async {}
 
   trazarRecorrido() async {
     print("Entró al trazar recorrido");
@@ -1067,93 +1073,92 @@ class _MapViewState extends State<MapView> {
                     Column(
                       children: [
                         Container(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          margin:
-                              EdgeInsets.only(top: 550, right: 100, left: 100),
-                          decoration: BoxDecoration(
-                            color: Colors.green[900],
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset:
-                                    Offset(0, 3), // changes position of shadow
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            margin: EdgeInsets.only(
+                                top: 550, right: 100, left: 100),
+                            decoration: BoxDecoration(
+                              color: Colors.green[900],
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                                bottomLeft: Radius.circular(10),
+                                bottomRight: Radius.circular(10),
                               ),
-                            ],
-                          ),
-                          child: ListTile(
-                            title: const Text(
-                              "Ver Sugerencias",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                  fontStyle: FontStyle.italic),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: Offset(
+                                      0, 3), // changes position of shadow
+                                ),
+                              ],
                             ),
-                            trailing: Icon(
-                              Icons.visibility,
-                              color: Colors.white,
-                            ),
-                            onTap: () async {
-                              // ScaffoldMessenger.of(context).showSnackBar(
-                              //   SnackBar(
-                              //     content: Container(
-                              //       padding: EdgeInsets.all(16),
-                              //       height: 90,
-                              //       decoration: BoxDecoration(
-                              //         color: Color(0xFFC72C41),
-                              //         borderRadius: BorderRadius.all(
-                              //           Radius.circular(20),
-                              //         ),
-                              //       ),
-                              //       child: Column(
-                              //         children: [
-                              //           Text("¡No hay micros disponibles!"),
-                              //           Text(
-                              //               "Intentelo nuevamente con otra línea porfavor."),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //     behavior: SnackBarBehavior.floating,
-                              //     backgroundColor: Colors.transparent,
-                              //     elevation: 0,
-                              //   ),
-                              // );
-                              setState(() {
-                                loadingScreen = true;
-                              });
-                              final positionProvider =
-                                  Provider.of<PositionProvider>(context,
-                                      listen: false);
+                            child: ListTile(
+                              title: const Text(
+                                "Ver Sugerencias",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontStyle: FontStyle.italic),
+                              ),
+                              trailing: Icon(
+                                Icons.visibility,
+                                color: Colors.white,
+                              ),
+                              onTap: () async {
+                                setState(() {
+                                  loadingScreen = true;
+                                });
+                                final positionProvider =
+                                    Provider.of<PositionProvider>(context,
+                                        listen: false);
 
-                              if (positionProvider.recorridoSelected == 0 ||
-                                  positionProvider.recorridosShowed == false) {
-                                await loadData4();
+                                if (positionProvider.recorridoSelected == 0 ||
+                                    positionProvider.recorridosShowed ==
+                                        false) {
+                                  await loadData4();
 
-                                positionProvider.micros = microLinea;
-                                positionProvider.distances = distanceOneRoute;
-                              } else {
-                                microLinea = positionProvider.micros;
-                                distanceOneRoute = positionProvider.distances;
-                              }
+                                  if (findMicro == false) {
+                                    final snackBar = SnackBar(
+                                      /// need to set following properties for best effect of awesome_snackbar_content
+                                      elevation: 10,
+                                      behavior: SnackBarBehavior.fixed,
+                                      backgroundColor:
+                                          ui.Color.fromRGBO(0, 0, 0, 0),
+                                      content: AwesomeSnackbarContent(
+                                        title: messageTitle,
+                                        message: messageSubtitle,
 
-                              positionProvider.recorridosShowed = true;
+                                        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                        contentType: ContentType.failure,
+                                      ),
+                                    );
 
-                              setState(() {});
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => MicrosListPage(
-                                          microLinea, distanceOneRoute)));
-                            },
-                          ),
-                        ),
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar()
+                                      ..showSnackBar(snackBar);
+                                    return;
+                                  }
+
+                                  positionProvider.micros = microLinea;
+                                  positionProvider.distances = distanceOneRoute;
+                                } else {
+                                  microLinea = positionProvider.micros;
+                                  distanceOneRoute = positionProvider.distances;
+                                }
+
+                                positionProvider.recorridoSelected = 99;
+                                positionProvider.recorridosShowed = true;
+
+                                setState(() {});
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => MicrosListPage(
+                                            microLinea, distanceOneRoute)));
+                              },
+                            )),
                       ],
                     ),
                     Positioned(
