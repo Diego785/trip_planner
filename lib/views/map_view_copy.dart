@@ -76,6 +76,7 @@ class _MapViewState extends State<MapView> {
   List<LatLng> latlng = [];
   List<LatLng> latlng2 = [];
   List<double> distances = [];
+  List<double> distances2 = [];
 
 // Testing the shortest route
   List<LatLng> latlngStart = [];
@@ -92,6 +93,8 @@ class _MapViewState extends State<MapView> {
 
 //Variables para listar los micros que pasan por origen y destino
   List<int> nearestMicrosOrigen = [];
+  List<List<int>> micros = [];
+  List<int> nearestMicrosOrigen2 = [];
   List<int> nearestMicrosDestiny = [];
   //Variables para guardar los micros que pasan por ambos puntos
   List<int> nearestMicrosOrigenOneRoute = [];
@@ -99,6 +102,7 @@ class _MapViewState extends State<MapView> {
   List<double> distanceOneRoute = [];
   // double timeOneRouteStart = 0;
   List<double> timeOneRoute = [];
+  List<int> microsOneRoute2 = [];
 
   bool trazarRuta = false;
   bool addPerson = false;
@@ -212,6 +216,100 @@ class _MapViewState extends State<MapView> {
       microsPurgados.add(micros[micros.length - 1]);
     }
     return microsPurgados;
+  }
+
+  purgarMicrosRepetidosdelOrigen(List<int> micros) {
+    bool bandera = false;
+    int j;
+
+    for (int i = 0; i < nearestMicrosOrigen2.length; i++) {
+      for (j = 0; j < micros.length; j++) {
+        if (micros[j] == nearestMicrosOrigen2[i]) {
+          micros.removeAt(j);
+          break;
+        }
+      }
+    }
+  }
+
+  Future<List<PuntosModel>> api(int recorrido, int par) async {
+    List<PuntosModel> ayuda = [];
+    await PuntosService.getPuntos(recorrido, par).then((puntos) {
+      ayuda = puntos;
+    });
+    return ayuda;
+  }
+
+  purgarRepetidos(List<List<int>> listaDelistas) {
+    for (int i = 0; i < listaDelistas.length - 1; i++) {
+      List<int> aux = listaDelistas[i];
+      List<int> aux2 = listaDelistas[i + 1];
+      if (aux[0] == aux2[0] && aux[1] == aux2[1]) {
+        listaDelistas.removeAt(i);
+      }
+    }
+  }
+
+  //PROCEDIMIENTO PARA TRAER MICROS CON TRANSBORDO Y SUS DISTANCIAS
+  transbordo(List<int> recorridos1, List<int> recorridos2) async {
+    int recorridoController1 = 0;
+    int parController1 = 0;
+    int recorridoController2 = 0;
+    int parController2 = 0;
+    double distance = 0;
+
+    final positionProvider =
+        Provider.of<PositionProvider>(context, listen: false);
+
+    for (int i = 0; i < recorridos2.length; i++) {
+      if (recorridos2[i] % 2 != 0) {
+        parController2 = 1;
+        recorridoController2 = ((recorridos2[i] + 1) / 2).truncate();
+      } else {
+        parController2 = 2;
+        recorridoController2 = (recorridos2[i] / 2).truncate();
+      }
+      await PuntosService.getPuntos(recorridoController2, parController2)
+          .then((puntos) async {
+        List<PuntosModel> ayuda = [];
+        bool bandera = false;
+        distance = 0;
+        for (int j = 0; j < recorridos1.length; j++) {
+          if (recorridos1[j] % 2 != 0) {
+            parController1 = 1;
+            recorridoController1 = ((recorridos1[j] + 1) / 2).truncate();
+          } else {
+            parController1 = 2;
+            recorridoController1 = (recorridos1[j] / 2).truncate();
+          }
+          ayuda = await api(recorridoController1, parController1);
+          for (int k = 0; k < puntos.length; k++) {
+            for (int l = 0; l < ayuda.length - 1; l++) {
+              if (puntos[k].fidStops2 == ayuda[l + 1].fidStops2) {
+                print('entró');
+                microsOneRoute2.add(puntos[k].recorridoId);
+                microsOneRoute2.add(ayuda[l + 1].recorridoId);
+                micros.add(microsOneRoute2);
+                microsOneRoute2.removeRange(0, 2);
+                break;
+              }
+            }
+            // if (Geolocator.distanceBetween(
+            //             double.parse(puntos[k].lati),
+            //             double.parse(puntos[k].longi),
+            //             positionProvider.endPositionLati,
+            //             positionProvider.endPositionLongi) <
+            //         300 &&
+            //     bandera) {
+            //   microsOneRoute2.add(puntos[k].recorridoId);
+            //   microsOneRoute2.add(ayuda[0].recorridoId);
+            //   distances2.add(distance);
+            //   bandera = false;
+            // }
+          }
+        }
+      });
+    }
   }
 
   //FUNCIÓN PARA LISTAR LOS MICROS QUE PASAN POR AMBOS PUNTOS, DE ORIGEN Y DESTINO
@@ -419,14 +517,44 @@ class _MapViewState extends State<MapView> {
       return;
     }
 
+    print('aaaa');
+    print(nearestMicrosOrigen);
+    print(nearestMicrosDestiny);
+
     nearestMicrosOrigen = purgarMicros(
         nearestMicrosOrigen); // AQUÍ YA SE TIENE LOS MICROS QUE PASAN POR EL PUNTO DE ORIGEN, SIN REPETIDOS
 
     nearestMicrosDestiny = purgarMicros(nearestMicrosDestiny);
 
+    print('bbbbb');
+    print(nearestMicrosOrigen);
+    print(nearestMicrosDestiny);
+    nearestMicrosOrigen2 = nearestMicrosOrigen;
+    purgarMicrosRepetidosdelOrigen(nearestMicrosDestiny);
+
+    print('cccc');
+    print(nearestMicrosOrigen2);
+    print(nearestMicrosDestiny);
+    print(micros);
+
+    //funcion para traerme la distancia y si hay transbordo
+    await transbordo(nearestMicrosOrigen2, nearestMicrosDestiny);
+
+    purgarRepetidos(micros);
+
+    print('ggggg');
+    print(micros);
+    print('gggggg');
+    print(microsOneRoute2);
+
     await verifOneRouteAndOrderOptimum(nearestMicrosOrigen);
 
+    //nearestMicrosOrigen.add(.........)
+    //distance.add(......)
+
+    print('bbbb');
     print(nearestMicrosOrigen);
+    print(nearestMicrosDestiny);
 
     final Uint8List walking = await getBytesFromAssets(personWalking, 125);
     final Uint8List markerPoinRecomendations =
@@ -1142,7 +1270,6 @@ class _MapViewState extends State<MapView> {
                                       ..showSnackBar(snackBar);
                                     return;
                                   }
-                                  findMicro = false;
 
                                   positionProvider.micros = microLinea;
                                   positionProvider.distances = distanceOneRoute;
