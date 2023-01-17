@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -9,13 +10,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:trip_planner/blocs/blocs.dart';
 import 'package:trip_planner/complements/loading_page2.dart';
 import 'package:trip_planner/helpers/helpers.dart';
+import 'package:trip_planner/implementation_cards/ui/contact_list_page.dart';
 import 'package:trip_planner/models/models.dart';
-import 'package:trip_planner/pages/prueba.dart';
 import 'package:trip_planner/providers/providers.dart';
 import 'package:trip_planner/services/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_place/google_place.dart';
-import 'package:trip_planner/models/specific_line.dart';
+import 'package:trip_planner/widgets/widgets.dart';
 
 class MapView extends StatefulWidget {
   final int recorrido;
@@ -23,9 +24,9 @@ class MapView extends StatefulWidget {
   final DetailsResult? startPosition;
   final DetailsResult? endPosition;
   //para la ultima localizacion del usuario
-  final LatLng initialLocation;
+  final LatLng? initialLocation;
   const MapView(this.recorrido, this.par, this.startPosition, this.endPosition,
-      {super.key, required this.initialLocation});
+      this.initialLocation);
 
   @override
   State<MapView> createState() => _MapViewState();
@@ -35,6 +36,7 @@ class _MapViewState extends State<MapView> {
   Completer<GoogleMapController> _controller = Completer();
   List<PuntosModel> _puntos = [];
   List<PuntosModel> _puntos2 = [];
+  List<PuntosModel> _puntos3 = [];
 
   final CameraPosition _kGooglePlex = const CameraPosition(
     target: LatLng(-17.782158, -63.180684),
@@ -65,30 +67,50 @@ class _MapViewState extends State<MapView> {
   final Set<Polyline> _polyline = {};
   List<LatLng> latlng = [];
   List<LatLng> latlng2 = [];
+  List<LatLng> latlng3 = [];
   List<double> distances = [];
+  List<double> distances2 = [];
 
 // Testing the shortest route
   List<LatLng> latlngStart = [];
   List<LatLng> latlngEnd = [];
-  List<RutaModel> _puntosStart = [];
 
   List<LatLng> latlngStartOneRoute = [];
   List<LatLng> latlngEndOneRoute = [];
-  List<PuntosModel>? _puntosStartOneRoute = [];
-  List<PuntosModel>? _puntosEndOneRoute = [];
   List<SpecificLine> microLinea =
       []; // variable para traer los datos principales del micro através de una api
-  double distanceStartOneRoute = 0;
-  double distanceEndOneRoute = 0;
-  double timeOneRouteStart = 0;
-  double timeOneRouteEnd = 0;
+//List<LatLng> rutaMicro = [];
+
+//Variables para listar los micros que pasan por origen y destino
+  List<int> nearestMicrosOrigen = [];
+  List<List<int>> micros = [];
+  List<int> nearestMicrosOrigen2 = [];
+  List<int> nearestMicrosDestiny = [];
+  //Variables para guardar los micros que pasan por ambos puntos
+  List<int> nearestMicrosOrigenOneRoute = [];
+  // double distanceStartOneRoute = 0;
+  List<double> distanceOneRoute = [];
+  // double timeOneRouteStart = 0;
+  List<double> timeOneRoute = [];
+  List<int> microsOneRoute2 = [];
+
+  bool trazarRuta = false;
   bool addPerson = false;
   bool loadingScreen = false;
+  bool findMicroEmpty = false;
+  bool walkingRouteOrigen = false;
+  bool walkingRouteDestiny = false;
+  String messageTitle = '';
+  String messageSubtitle = '';
 
   double startPointLongi = 0;
   double startPointLati = 0;
   double endPointLongi = 0;
   double endPointLati = 0;
+
+  List<PuntosModel> rutaSelected = [];
+  List<LatLng> listaRutaSelected = [];
+
   var recorridos = 0;
   var origens = null;
   LatLng? puntoOrigen;
@@ -96,10 +118,16 @@ class _MapViewState extends State<MapView> {
 
   @override
   void initState() {
+    print('Entró al Init State');
+    final positionProvider =
+        Provider.of<PositionProvider>(context, listen: false);
     int recorrido = widget.recorrido;
     int parImpar = widget.par;
+    print(recorrido);
+    print(parImpar);
     DetailsResult? origen = widget.startPosition;
-    DetailsResult? destino = widget.endPosition;
+    positionProvider.startPosition = widget.startPosition;
+    positionProvider.endPosition = widget.endPosition;
 
     super.initState();
     if (recorrido != 0) {
@@ -116,31 +144,41 @@ class _MapViewState extends State<MapView> {
       } else {
         PuntosService.getPuntos(recorrido, 1).then((puntos) {
           setState(() {
-            _puntos = puntos;
-            latlng = listaLatLng(_puntos);
-            loadData();
-          });
-        });
-        Provider.of<PuntosProvider>(context, listen: false)
-            .setPunto(recorrido, 1);
-        PuntosService.getPuntos(recorrido, 2).then((puntos) {
-          setState(() {
             _puntos2 = puntos;
             latlng2 = listaLatLng(_puntos2);
             loadData2();
           });
         });
-        Provider.of<PuntosProvider>(context, listen: false)
-            .setPunto(recorrido, 2);
+
+        PuntosService.getPuntos(recorrido, 2).then((puntos) {
+          setState(() {
+            _puntos3 = puntos;
+            latlng3 = listaLatLng(_puntos3);
+            loadData5();
+          });
+        });
+        setState(() {
+          Provider.of<PuntosProvider>(context, listen: false).punto = [];
+        });
       }
     }
     if (origen != null) {
       setState(() {
-        loadData3();
-        // puntoOrigen = LatLng(widget.startPosition!.geometry!.location!.lat!,
-        //                 widget.startPosition!.geometry!.location!.lng!);
-        // puntoDestino = LatLng(widget.endPosition!.geometry!.location!.lat!,
-        //                 widget.endPosition!.geometry!.location!.lng!);
+        if (positionProvider.recorridosShowed == false) {
+          positionProvider.startPositionLati =
+              widget.startPosition!.geometry!.location!.lat!;
+          positionProvider.startPositionLongi =
+              widget.startPosition!.geometry!.location!.lng!;
+          positionProvider.endPositionLati =
+              widget.endPosition!.geometry!.location!.lat!;
+          positionProvider.endPositionLongi =
+              widget.endPosition!.geometry!.location!.lng!;
+        }
+        if (widget.recorrido == 0 && widget.par != 99) {
+          loadData3();
+        } else {
+          trazarRecorrido();
+        }
       });
     }
     setState(() {
@@ -149,134 +187,155 @@ class _MapViewState extends State<MapView> {
     });
   }
 
-//RECORTA LA LISTA DE PUNTOS POR DONDE PASA EL MICRO DE ORIGEN, SIEMPRE Y CUANDO PASE TAMBIÉN POR EL DESTINO. CREA UNA LISTA DESDE EL PUNTO DE ORIGEN AL PUNTO DE DESTINO.
-  List<PuntosModel>? findRouteNearStart(List<PuntosModel> puntos,
-      LatLng nearestPointStart, double endPointLati, double endPointLongi) {
-    List<PuntosModel>? lista;
-    double latiPosFinal = 0;
-    double longiPosFinal = 0;
-
-    int indexIni = puntos.indexWhere((element) =>
-        double.parse(element.lati) == nearestPointStart.latitude &&
-        double.parse(element.longi) == nearestPointStart.longitude);
-
-    print("PUNTO MÁS CERCANO AL INICIO: $nearestPointStart");
-    int indexFinal = 0;
-    int count = 0;
-    double minimunDistance = 999999.9;
-    puntos.forEach((element) {
-      if (Geolocator.distanceBetween(double.parse(element.lati),
-              double.parse(element.longi), endPointLati, endPointLongi) <
-          minimunDistance) {
-        minimunDistance = Geolocator.distanceBetween(double.parse(element.lati),
-            double.parse(element.longi), endPointLati, endPointLongi);
-        //indexFinal = count; // CHECK THIS
-
-        print(element.lati);
-        print(element.longi);
-        latiPosFinal = double.parse(element.lati);
-        longiPosFinal = double.parse(element.longi);
-        print("COUNT: $count");
-        print(
-            "MINIMUN DISTANCE IN THE FIRST MICRO CROSSING THE DESTINY POINT: $minimunDistance");
+  bool verifMicroRoute(List<int> micros, int recorridoId) {
+    for (var i = 0; i < micros.length - 1; i++) {
+      if (micros.indexOf(i) == recorridoId) {
+        return true;
       }
-      count++;
-    });
-
-    indexFinal = puntos.indexWhere((element) =>
-        double.parse(element.lati) == latiPosFinal &&
-        double.parse(element.longi) == longiPosFinal);
-
-    print(latiPosFinal);
-    print('INDEX FINAL: $indexFinal');
-
-    if (indexIni < indexFinal) {
-      lista = puntos.sublist(indexIni, indexFinal);
-    } else {
-      lista = puntos.sublist(indexFinal, indexIni);
     }
-
-    print(nearestPointStart);
-    print("INITIAL POSTION IN THE INITIAL ROUTE: " + indexIni.toString());
-
-    return (minimunDistance < 500) ? lista : null;
+    return false;
   }
 
-//RECORTA LA LISTA DE PUNTOS POR DONDE PASA EL MICRO DE DESTINO, SIEMPRE Y CUANDO PASE TAMBIÉN POR EL ORIGEN. CREA UNA LISTA DESDE EL PUNTO DE ORIGEN AL PUNTO DE DESTINO.
-  List<PuntosModel>? findRouteNearEnd(List<PuntosModel> puntos,
-      LatLng nearestPointEnd, double startPointLati, double startPointLongi) {
-    List<PuntosModel>? lista;
-    double latiPosIni = 0;
-    double longiPosIni = 0;
-
-    int indexFinal = puntos.indexWhere((element) =>
-        double.parse(element.lati) == nearestPointEnd.latitude &&
-        double.parse(element.longi) == nearestPointEnd.longitude);
-
-    int indexIni = 0;
-    int count = 0;
-
-    double minimunDistance = 9999.9;
-    puntos.forEach((element) {
-      if (Geolocator.distanceBetween(double.parse(element.lati),
-              double.parse(element.longi), startPointLati, startPointLongi) <
-          minimunDistance) {
-        minimunDistance = Geolocator.distanceBetween(double.parse(element.lati),
-            double.parse(element.longi), startPointLati, startPointLongi);
-        latiPosIni = double.parse(element.lati);
-        longiPosIni = double.parse(element.longi);
-        //indexIni = count;
-        print(
-            "MINIMUN DISTANCE IN THE FINAL MCIRO CROSSING THE INITIAL POINT: $minimunDistance");
+  List<int> purgarMicros(List<int> micros) {
+    List<int> microsPurgados = [];
+    microsPurgados.add(micros[0]);
+    for (var i = 1; i < micros.length; i++) {
+      if (microsPurgados.contains(micros[i]) == false) {
+        microsPurgados.add(micros[i]);
       }
-      count++;
-    });
+    }
+    return microsPurgados;
+  }
 
-    indexIni = puntos.indexWhere((element) =>
-        double.parse(element.lati) == latiPosIni &&
-        double.parse(element.longi) == longiPosIni);
-    if (indexIni < indexFinal) {
-      lista = puntos.sublist(indexIni, indexFinal);
-    } else {
-      lista = puntos.sublist(indexFinal, indexIni);
+  //FUNCIÓN PARA LISTAR LOS MICROS QUE PASAN POR AMBOS PUNTOS, DE ORIGEN Y DESTINO
+  verifOneRouteAndOrderOptimum(List<int> recorridos) async {
+    List<int> microsOneRoute = [];
+    List<double> distances = [];
+    int recorridoController = 0;
+    int parController = 0;
+    double distance = 0;
+
+    final positionProvider =
+        Provider.of<PositionProvider>(context, listen: false);
+
+    for (int i = 0; i < recorridos.length; i++) {
+      if (recorridos[i] % 2 != 0) {
+        parController = 1;
+        recorridoController = ((recorridos[i] + 1) / 2).truncate();
+      } else {
+        parController = 2;
+        recorridoController = (recorridos[i] / 2).truncate();
+      }
+      await PuntosService.getPuntos(recorridoController, parController)
+          .then((puntos) {
+        bool bandera = false;
+        distance = 0;
+        for (var i = 0; i < puntos.length - 1; i++) {
+          if ((Geolocator.distanceBetween(
+                      double.parse(puntos[i].lati),
+                      double.parse(puntos[i].longi),
+                      positionProvider.startPositionLati,
+                      positionProvider.startPositionLongi) <
+                  300) &&
+              Geolocator.distanceBetween(
+                      double.parse(puntos[i].lati),
+                      double.parse(puntos[i].longi),
+                      positionProvider.startPositionLati,
+                      positionProvider.startPositionLongi) <
+                  (Geolocator.distanceBetween(
+                      double.parse(puntos[i + 1].lati),
+                      double.parse(puntos[i + 1].longi),
+                      positionProvider.startPositionLati,
+                      positionProvider.startPositionLongi))) {
+            bandera = true;
+          }
+          if (bandera) {
+            distance = distance +
+                Geolocator.distanceBetween(
+                    double.parse(puntos[i].lati),
+                    double.parse(puntos[i].longi),
+                    double.parse(puntos[i + 1].lati),
+                    double.parse(puntos[i + 1].longi));
+          }
+
+          if (Geolocator.distanceBetween(
+                      double.parse(puntos[i].lati),
+                      double.parse(puntos[i].longi),
+                      positionProvider.endPositionLati,
+                      positionProvider.endPositionLongi) <
+                  300 &&
+              Geolocator.distanceBetween(
+                      double.parse(puntos[i].lati),
+                      double.parse(puntos[i].longi),
+                      positionProvider.endPositionLati,
+                      positionProvider.endPositionLongi) <
+                  (Geolocator.distanceBetween(
+                      double.parse(puntos[i + 1].lati),
+                      double.parse(puntos[i + 1].longi),
+                      positionProvider.endPositionLati,
+                      positionProvider.endPositionLongi)) &&
+              bandera) {
+            microsOneRoute.add(puntos[i].recorridoId);
+            distances.add(distance);
+            bandera = false;
+          }
+        }
+      });
     }
 
-    print(nearestPointEnd);
-    print("INITIAL POSITION IN THE ENDING ROUTE: " + indexFinal.toString());
-
-    return (minimunDistance < 500) ? lista : null;
+    nearestMicrosOrigen.clear();
+//ALGORITMO PARA ORDENAR LOS MICROS QUE HACEN MENOS RECORRIDO DESDE EL PUNTO DE ORIGEN AL PUNTO DE DESTINO
+    for (int i = 0; i < distances.length; i++) {
+      if (distanceOneRoute.isEmpty) {
+        distanceOneRoute.add(distances[i]);
+        nearestMicrosOrigen.add(microsOneRoute[i]);
+      } else {
+        for (int j = 0; j < distanceOneRoute.length; j++) {
+          if (distances[i] < distanceOneRoute[j]) {
+            distanceOneRoute.insert(j, distances[i]);
+            nearestMicrosOrigen.insert(j, microsOneRoute[i]);
+            j = distanceOneRoute.length - 1;
+          } else if (j == distanceOneRoute.length - 1) {
+            distanceOneRoute.add(distances[i]);
+            nearestMicrosOrigen.add(microsOneRoute[i]);
+            j = distanceOneRoute.length - 1;
+          }
+        }
+      }
+    }
   }
 
 //CREA LOS MARCADORES PRINCIPALES, UNA VEZ SELECCIONADO EL ORIGEN Y EL DESTINO
   loadData3() async {
 //--------------------------------------------------------------------------------------------------------------------------------------------------
+    print("Entró al load data 3");
+    final positionProvider =
+        Provider.of<PositionProvider>(context, listen: false);
     final Uint8List markerIcon = await getBytesFromAssets(images, 125);
 
     _markers2.add(Marker(
         markerId: const MarkerId('start'),
-        position: (startPointLati != 0 && startPointLongi != 0)
-            ? LatLng(startPointLati, startPointLongi)
-            : LatLng(widget.startPosition!.geometry!.location!.lat!,
-                widget.startPosition!.geometry!.location!.lng!),
+        position: LatLng(widget.startPosition!.geometry!.location!.lat!,
+            widget.startPosition!.geometry!.location!.lng!),
         infoWindow: const InfoWindow(
           title: 'Origen',
         ),
         draggable: true,
         onDragEnd: (newPosition1) {
           // posicion1 = newPosition1;
-          startPointLati = newPosition1.latitude;
-          startPointLongi = newPosition1.longitude;
-
-          print('Primero');
-          print(newPosition1.latitude.toString() +
-              newPosition1.longitude.toString());
+          setState(() {
+            positionProvider.startPositionLati = newPosition1.latitude;
+            positionProvider.startPositionLongi = newPosition1.longitude;
+            nearestMicrosOrigen = [];
+            nearestMicrosDestiny = [];
+            positionProvider.recorridoSelected = 0;
+            positionProvider.recorridosShowed = false;
+          });
         }));
     _markers2.add(Marker(
         markerId: const MarkerId('end'),
-        position: (endPointLati != 0 && endPointLongi != 0)
-            ? LatLng(endPointLati, endPointLongi)
-            : LatLng(widget.endPosition!.geometry!.location!.lat!,
-                widget.endPosition!.geometry!.location!.lng!),
+        position: LatLng(widget.endPosition!.geometry!.location!.lat!,
+            widget.endPosition!.geometry!.location!.lng!),
         infoWindow: const InfoWindow(
           title: 'Destino',
         ),
@@ -284,363 +343,365 @@ class _MapViewState extends State<MapView> {
         draggable: true,
         onDragEnd: (newPosition2) {
           // posicion1 = newPosition1;
-          endPointLati = newPosition2.latitude;
-          endPointLongi = newPosition2.longitude;
-          print('Segundo');
-          print(newPosition2.latitude.toString() +
-              newPosition2.longitude.toString());
+          setState(() {
+            positionProvider.endPositionLati = newPosition2.latitude;
+            positionProvider.endPositionLongi = newPosition2.longitude;
+            nearestMicrosOrigen = [];
+            nearestMicrosDestiny = [];
+            positionProvider.recorridoSelected = 0;
+            positionProvider.recorridosShowed = false;
+          });
         }));
   }
 
 // ENCUENTRA LAS APROXIMACIONES, VERIFICA SI UN MICRO PASA POR DOS PUNTOS, CREA LOS MARCADORES Y LA POLYLINE
   loadData4() async {
-    print("Entró al loadData4");
-    int fid1 = 0;
-    int fid2 = 0;
+    print("Entró al load data 4");
 
-    // Find the nearest points to show the recommendations
-    LatLng nearestPointStart = LatLng(0, 0);
-    LatLng nearestPointEnd = LatLng(0, 0);
+    final positionProvider =
+        Provider.of<PositionProvider>(context, listen: false);
 
-    // LatLng nearestPointStartOneBus = LatLng(0, 0);
-    // LatLng nearestPointEndOneBus = LatLng(0, 0);
-
-    if (startPointLati == 0) {
-      startPointLati = widget.startPosition!.geometry!.location!.lat!;
+    if (positionProvider.startPositionLati == 0) {
+      positionProvider.startPositionLati =
+          widget.startPosition!.geometry!.location!.lat!;
     }
-    if (startPointLongi == 0) {
-      startPointLongi = widget.startPosition!.geometry!.location!.lng!;
+    if (positionProvider.startPositionLongi == 0) {
+      positionProvider.startPositionLongi =
+          widget.startPosition!.geometry!.location!.lng!;
     }
-    if (endPointLati == 0) {
-      endPointLati = widget.endPosition!.geometry!.location!.lat!;
+    if (positionProvider.endPositionLati == 0.0) {
+      positionProvider.endPositionLati =
+          widget.endPosition!.geometry!.location!.lat!;
     }
-    if (endPointLongi == 0) {
-      endPointLongi = widget.endPosition!.geometry!.location!.lng!;
+    if (positionProvider.endPositionLongi == 0.0) {
+      positionProvider.endPositionLongi =
+          widget.endPosition!.geometry!.location!.lng!;
     }
-
-    double menorStartLati = 999.9;
-    double menorStartLongi = 999.9;
-    double menorEndLati = 999.9;
-    double menorEndLongi = 999.9;
-
-    int micro = 0;
-    int microFinal = 0;
 
     await PuntosService.getAllPuntos().then((puntos) {
-      // final puntoMap = puntos.asMap();
-      // recorrido_id = puntos.last.recorridoId;
-
       puntos.reversed.forEach((element) {
-        // print(double.parse(element.lati).abs()- startPointLati.abs());
-
-        print(element.recorridoId);
-
-        if (((double.parse(element.lati).abs() - startPointLati.abs()).abs() <=
-                menorStartLati &&
-            (double.parse(element.longi).abs() - startPointLongi.abs()).abs() <=
-                menorStartLongi)) {
-          print(menorStartLati);
-          menorStartLati =
-              (double.parse(element.lati).abs() - startPointLati.abs()).abs();
-          menorStartLongi =
-              (double.parse(element.longi).abs() - startPointLongi.abs()).abs();
-          nearestPointStart = LatLng(-double.parse(element.lati).abs(),
-              -double.parse(element.longi).abs());
-          micro = element.recorridoId;
-          fid1 = element.id;
+        //VERIFICA QUE LOS MICROS PASEN POR EL PUNTO DE ORIGEN
+        if ((Geolocator.distanceBetween(
+                double.parse(element.lati),
+                double.parse(element.longi),
+                positionProvider.startPositionLati,
+                positionProvider.startPositionLongi) <
+            300)) {
+          nearestMicrosOrigen.add(element.recorridoId);
         }
-
-        if ((double.parse(element.latiD).abs() - endPointLati.abs()).abs() <=
-                menorEndLati &&
-            (double.parse(element.longiD).abs() - endPointLongi.abs()).abs() <=
-                menorEndLongi) {
-          menorEndLati =
-              (double.parse(element.latiD).abs() - endPointLati.abs()).abs();
-          menorEndLongi =
-              (double.parse(element.longiD).abs() - endPointLongi.abs()).abs();
-          nearestPointEnd = LatLng(-double.parse(element.latiD).abs(),
-              -double.parse(element.longiD).abs());
-          microFinal = element.recorridoId;
-          fid2 = element.id;
+        if ((Geolocator.distanceBetween(
+                double.parse(element.lati),
+                double.parse(element.longi),
+                positionProvider.endPositionLati,
+                positionProvider.endPositionLongi) <
+            300)) {
+          nearestMicrosDestiny.add(element.recorridoId);
         }
       });
     });
-
-// POR SI UN MICRO PASA POR LOS DOS PUNTOS
-    int recorridoController = 0;
-    int parController = 0;
-    if (micro % 2 != 0) {
-      parController = 1;
-      recorridoController = ((micro + 1) / 2).truncate();
-    } else {
-      parController = 2;
-      recorridoController = (micro / 2).truncate();
-    }
-
-    await PuntosService.getPuntos(recorridoController, parController)
-        .then((puntos) {
-      _puntosStartOneRoute = findRouteNearStart(
-          puntos, nearestPointStart, endPointLati, endPointLongi);
-      if (_puntosStartOneRoute != null) {
-        latlngStartOneRoute = listaLatLng(_puntosStartOneRoute!);
-        distanceStartOneRoute = listaLatLngDistance(_puntosStartOneRoute!);
-        distanceStartOneRoute =
-            double.parse((distanceStartOneRoute / 1000).toStringAsFixed(2));
+    if (nearestMicrosOrigen.isEmpty ||
+        nearestMicrosDestiny.isEmpty ||
+        (Geolocator.distanceBetween(
+                positionProvider.startPositionLati,
+                positionProvider.startPositionLongi,
+                positionProvider.endPositionLati,
+                positionProvider.endPositionLongi) <
+            500) ||
+        findMicroEmptyOrigenAndDestiny(
+                nearestMicrosOrigen, nearestMicrosDestiny) ==
+            false) {
+      if (nearestMicrosOrigen.isEmpty) {
+        messageTitle = '¡Algo no funcionó correctamente!';
+        messageSubtitle = 'No se encontró micro por la zona de Origen';
+      } else if (nearestMicrosDestiny.isEmpty) {
+        messageTitle = '¡Algo no funcionó correctamente!';
+        messageSubtitle = 'No se encontró micro por la zona de Destino';
+      } else if (Geolocator.distanceBetween(
+              positionProvider.startPositionLati,
+              positionProvider.startPositionLongi,
+              positionProvider.endPositionLati,
+              positionProvider.endPositionLongi) <
+          500) {
+        messageTitle = '¡Algo no funcionó correctamente!';
+        messageSubtitle = 'La distancia es menor a 500 mts.';
+      } else {
+        messageTitle = '¡Algo no funcionó correctamente!';
+        messageSubtitle = 'Se requiere hacer transbordo';
       }
-    });
+      positionProvider.dispose();
+      origens = 0;
 
-    if (microFinal % 2 != 0) {
-      parController = 1;
-      recorridoController = ((microFinal + 1) / 2).truncate();
+      findMicroEmpty = true;
+      loadingScreen = false;
+      setState(() {});
+
+      return;
     } else {
-      parController = 2;
-      recorridoController = (microFinal / 2).truncate();
+      findMicroEmpty = false;
     }
 
-    await PuntosService.getPuntos(recorridoController, parController)
-        .then((puntos) {
-      setState(() {
-        _puntosEndOneRoute = findRouteNearEnd(
-            puntos, nearestPointEnd, startPointLati, startPointLongi);
-        if (_puntosEndOneRoute != null) {
-          latlngEndOneRoute = listaLatLng(_puntosEndOneRoute!);
-          distanceEndOneRoute = listaLatLngDistance(_puntosEndOneRoute!);
-          distanceEndOneRoute =
-              double.parse((distanceEndOneRoute / 1000).toStringAsFixed(2));
-        }
-      });
-    });
+    print('aaaa');
+    print(nearestMicrosOrigen);
+    print(nearestMicrosDestiny);
 
-    print("El punto de partida es $startPointLati , $startPointLongi.");
-    print("El punto de llegada es $endPointLati , $endPointLongi.");
-    print(
-        'El punto más cercano al punto de inicio es: ($nearestPointStart) y le pertence a la linea con el recorrido $micro');
-    print(
-        'El punto más cercano al punto de finalización es: ($nearestPointEnd) y le pertenece a la línea con el recorrido $microFinal');
+    nearestMicrosOrigen = purgarMicros(
+        nearestMicrosOrigen); // AQUÍ YA SE TIENE LOS MICROS QUE PASAN POR EL PUNTO DE ORIGEN, SIN REPETIDOS
 
-    final Uint8List walking = await getBytesFromAssets(personWalking, 125);
-    final Uint8List markerPoinRecomendations =
-        await getBytesFromAssets(pointRecommendation, 125);
+    nearestMicrosDestiny = purgarMicros(nearestMicrosDestiny);
+
+    await verifOneRouteAndOrderOptimum(nearestMicrosOrigen);
+
     final Uint8List markerIcon = await getBytesFromAssets(images, 125);
-    final Uint8List markerbus = await getBytesFromAssets(bus, 125);
 
     //Recommendations
     _markers2.clear();
-    _markers2.add(Marker(
-        markerId: const MarkerId('startPointRecommendation'),
-        position: nearestPointStart,
-        infoWindow: const InfoWindow(
-          title: 'Origen Point Recommendation',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerPoinRecomendations),
-        draggable: true,
-        onDragEnd: (newPosition3) {
-          // posicion1 = newPosition1;
-          print('Primero');
-          print(newPosition3.latitude.toString() +
-              newPosition3.longitude.toString());
-        }));
-    _markers2.add(Marker(
-        markerId: const MarkerId('start'),
-        position: LatLng(startPointLati, startPointLongi),
-        infoWindow: const InfoWindow(
-          title: 'Origen',
-        ),
-        draggable: true,
-        onDragEnd: (newPosition1) {
-          // posicion1 = newPosition1;
-          startPointLati = newPosition1.latitude;
-          startPointLongi = newPosition1.longitude;
-          print('Primero');
-          print(newPosition1.latitude.toString() +
-              newPosition1.longitude.toString());
-        }));
 
-    // _markers2.clear();
     _markers2.add(Marker(
-        markerId: const MarkerId('endPointRecommendation'),
-        position: nearestPointEnd,
-        infoWindow: const InfoWindow(
-          title: 'Destiny Point Recommendation',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerPoinRecomendations),
-        draggable: true,
-        onDragEnd: (newPosition4) {
-          // posicion1 = newPosition1;
-          print('Primero');
-          print(newPosition4.latitude.toString() +
-              newPosition4.longitude.toString());
-        }));
-    _markers2.add(Marker(
-        markerId: const MarkerId('end'),
-        position: LatLng(endPointLati, endPointLongi),
-        infoWindow: const InfoWindow(
-          title: 'Destino',
-        ),
-        icon: BitmapDescriptor.fromBytes(markerIcon),
-        draggable: true,
-        onDragEnd: (newPosition2) {
-          // posicion1 = newPosition1;
-          endPointLati = newPosition2.latitude;
-          endPointLongi = newPosition2.longitude;
-          print('Segundo');
-          print(newPosition2.latitude.toString() +
-              newPosition2.longitude.toString());
-        }));
+      markerId: const MarkerId('start2'),
+      position: LatLng(positionProvider.startPositionLati,
+          positionProvider.startPositionLongi),
+      infoWindow: const InfoWindow(
+        title: 'Origen2',
+      ),
+      draggable: true,
+    ));
 
-    if (_puntosStartOneRoute != null) {
-      // Encuentra una sola ruta que lo lleva a destino con el micro que pasa en el punto inicial.
-      await LineServices.getMicro(micro).then((linea) {
-        setState(() {
-          microLinea = linea;
-          loadingScreen = false;
-          timeOneRouteStart = double.parse(
-              ((distanceStartOneRoute / microLinea.first.velocidad) * 60)
-                  .toStringAsFixed(2));
+    _markers2.add(Marker(
+      markerId: const MarkerId('end2'),
+      position: LatLng(
+          positionProvider.endPositionLati, positionProvider.endPositionLongi),
+      infoWindow: const InfoWindow(
+        title: 'Destino2',
+      ),
+      icon: BitmapDescriptor.fromBytes(markerIcon),
+      draggable: true,
+    ));
+
+    if (nearestMicrosOrigen != null) {
+      // Encuentra una sola ruta que lo lleva a destino con la lista de micros que pasa en el punto inicial.
+      for (int i = 0; i < nearestMicrosOrigen.length; i++) {
+        await LineServices.getMicro(nearestMicrosOrigen[i]).then((linea) {
+          setState(() {
+            microLinea.add(linea.last);
+          });
         });
+      }
+      setState(() {
+        loadingScreen = false;
       });
-
-      if (Geolocator.distanceBetween(nearestPointStart.latitude,
-              nearestPointStart.longitude, startPointLati, startPointLongi) >
-          300) {
-        _markers2.add(Marker(
-          markerId: const MarkerId('walking'),
-          position: LatLng(startPointLati, startPointLongi),
-          icon: BitmapDescriptor.fromBytes(walking),
-          draggable: true,
-        ));
-      }
-
-      for (int i = 0; i < latlngStartOneRoute.length; i++) {
-        setState(() {});
-        _polyline.add(Polyline(
-            polylineId: PolylineId('3'),
-            points: latlngStartOneRoute,
-            color: Colors.green,
-            width: 7,
-            startCap: Cap.roundCap,
-            endCap: Cap.roundCap));
-      }
-    } else if (_puntosEndOneRoute != null) {
-      // Encuentra una sola ruta que pasa por el destino con un micro que pasa por el punto inicial
-
-      await LineServices.getMicro(microFinal).then((linea) {
-        setState(() {
-          microLinea = linea;
-          loadingScreen = false;
-          timeOneRouteEnd = double.parse(
-              ((distanceEndOneRoute / microLinea.first.velocidad) * 60)
-                  .toStringAsFixed(2));
-        });
-      });
-
-      for (int i = 0; i < latlngEndOneRoute.length; i++) {
-        setState(() {});
-        _polyline.add(Polyline(
-            polylineId: PolylineId('4'),
-            points: latlngEndOneRoute,
-            color: Colors.green,
-            width: 7,
-            startCap: Cap.roundCap,
-            endCap: Cap.roundCap));
-      }
-    } else {
-      // Aquí señalamos las dos rutas de los micros más próximos en cada punto, origen y destino.
-
-      await PuntosService.transbordo(fid1, fid2).then((points) {
-        setState(() {
-          _puntosStart = points;
-          latlngStart = listaLatLng2(_puntosStart);
-          loadingScreen = false;
-        });
-      });
-      _markers2.add(Marker(
-        markerId: MarkerId(0.toString()),
-        position: latlngStart[0],
-        // infoWindow: InfoWindow(
-        //   title: 'Inicio $direccion',
-        //   snippet: 'Linea de $lineaMicro de $camino',
-        // ),
-        icon: BitmapDescriptor.fromBytes(markerPoinRecomendations),
-      ));
-      bool bandera = true;
-      for (int i = 0; i < latlngStart.length; i++) {
-        if (_puntosStart[0].recorridoId != _puntosStart[i].recorridoId &&
-            bandera) {
-          _markers2.add(Marker(
-            markerId: MarkerId(i.toString()),
-            position: latlngStart[i],
-            // infoWindow: InfoWindow(
-            //   title: 'Inicio $direccion',
-            //   snippet: 'Linea de $lineaMicro de $camino',
-            // ),
-            icon: BitmapDescriptor.fromBytes(markerbus),
-          ));
-          bandera = false;
-        }
-        setState(() {});
-        _polyline.add(Polyline(
-            polylineId: PolylineId('5'),
-            points: latlngStart,
-            color: Colors.green,
-            width: 7,
-            startCap: Cap.roundCap,
-            endCap: Cap.roundCap));
-      }
-      int l = latlngStart.length - 1;
-      _markers2.add(Marker(
-        markerId: MarkerId(l.toString()),
-        position: latlngStart[l],
-        // infoWindow: InfoWindow(
-        //   title: 'Inicio $direccion',
-        //   snippet: 'Linea de $lineaMicro de $camino',
-        // ),
-        icon: BitmapDescriptor.fromBytes(markerPoinRecomendations),
-      ));
     }
   }
 
-  loadData() async {
-    var color = _puntos[0].color;
-    Color colores = Colors.green;
-    switch (color) {
-      case 'Blanco':
-        {
-          colores = Colors.white;
+  bool findMicroEmptyOrigenAndDestiny(
+      List<int> nearestOrigen, List<int> nearestDestiny) {
+    for (int i = 0; i < nearestOrigen.length; i++) {
+      for (int j = 0; j < nearestDestiny.length; j++) {
+        if (nearestOrigen[i] == nearestDestiny[j]) {
+          return true;
         }
-        break;
-
-      case 'Rojo':
-        {
-          colores = Colors.red;
-        }
-        break;
-
-      case 'Azul':
-        {
-          colores = Colors.blue;
-        }
-        break;
-
-      case 'Green':
-        {
-          colores = Colors.green;
-        }
-        break;
-
-      case 'Celeste':
-        {
-          colores = Colors.lightBlue;
-        }
-        break;
-
-      case 'Castano':
-        {
-          colores = Colors.orange[900]!;
-        }
-        break;
+      }
     }
-    int lineaMicro = _puntos[0].lineaId;
+    return false;
+  }
+
+  trazarRecorrido() async {
+    print("Entró al trazar recorrido");
+
+    List<LatLng> walkingOrigenRecorrido = [];
+    List<LatLng> walkingDestinyRecorrido = [];
+    final positionProvider =
+        Provider.of<PositionProvider>(context, listen: false);
+
+    final Uint8List walking = await getBytesFromAssets(personWalking, 125);
+    final Uint8List markerIcon = await getBytesFromAssets(images, 125);
+
+    int? recorrido = 0;
+    int? par = 0;
+    if (positionProvider.recorridoSelected.toDouble() % 2 == 0) {
+      recorrido = (positionProvider.recorridoSelected / 2).toInt();
+      par = 2;
+    } else {
+      recorrido = ((positionProvider.recorridoSelected + 1) / 2).toInt();
+      par = 1;
+    }
+
+    int indexIni = -1;
+    int indexFinal = -1;
+
+    await PuntosService.getPuntos(recorrido, par).then((puntos) {
+      setState(() {
+        rutaSelected = puntos;
+      });
+    });
+
+    for (var i = 0; i < rutaSelected.length - 1; i++) {
+      if ((Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i].lati),
+                  double.parse(rutaSelected[i].longi),
+                  positionProvider.startPositionLati,
+                  positionProvider.startPositionLongi) <
+              300) &&
+          (Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i].lati),
+                  double.parse(rutaSelected[i].longi),
+                  positionProvider.startPositionLati,
+                  positionProvider.startPositionLongi) <
+              (Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i + 1].lati),
+                  double.parse(rutaSelected[i + 1].longi),
+                  positionProvider.startPositionLati,
+                  positionProvider.startPositionLongi))) &&
+          indexIni == -1) {
+        indexIni = i;
+      }
+      if ((Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i].lati),
+                  double.parse(rutaSelected[i].longi),
+                  positionProvider.endPositionLati,
+                  positionProvider.endPositionLongi) <
+              300) &&
+          (Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i].lati),
+                  double.parse(rutaSelected[i].longi),
+                  positionProvider.endPositionLati,
+                  positionProvider.endPositionLongi) <
+              (Geolocator.distanceBetween(
+                  double.parse(rutaSelected[i + 1].lati),
+                  double.parse(rutaSelected[i + 1].longi),
+                  positionProvider.endPositionLati,
+                  positionProvider.endPositionLongi))) &&
+          indexFinal == -1) {
+        indexFinal = i;
+      }
+    }
+
+    int indexAuxi = 0;
+    if (indexFinal < indexIni) {
+      indexAuxi = indexIni;
+      indexIni = indexFinal;
+      indexFinal = indexAuxi;
+    }
+
+    setState(() {
+      rutaSelected = rutaSelected.sublist(indexIni, indexFinal);
+      listaRutaSelected = listaLatLng(rutaSelected);
+    });
+
+    if (Geolocator.distanceBetween(
+            double.parse(rutaSelected[0].lati),
+            double.parse(rutaSelected[0].longi),
+            positionProvider.startPositionLati,
+            positionProvider.startPositionLongi) >
+        50) {
+      walkingRouteOrigen = true;
+    }
+
+    if (Geolocator.distanceBetween(
+            double.parse(rutaSelected[rutaSelected.length - 1].lati),
+            double.parse(rutaSelected[rutaSelected.length - 1].longi),
+            positionProvider.endPositionLati,
+            positionProvider.endPositionLongi) >
+        50) {
+      walkingRouteDestiny = true;
+    }
+
+    _markers2.clear();
+
+    _markers2.add(Marker(
+      markerId: const MarkerId('start3'),
+      position: LatLng(positionProvider.startPositionLati,
+          positionProvider.startPositionLongi),
+      infoWindow: const InfoWindow(
+        title: 'Origen3',
+      ),
+      draggable: true,
+    ));
+    if (walkingRouteOrigen) {
+      _markers2.add(Marker(
+        markerId: const MarkerId('personOrigen'),
+        position: LatLng(positionProvider.startPositionLati,
+            positionProvider.startPositionLongi),
+        infoWindow: const InfoWindow(
+          title: 'Person Origen',
+        ),
+        icon: BitmapDescriptor.fromBytes(walking),
+        draggable: true,
+      ));
+      walkingOrigenRecorrido.add(LatLng(positionProvider.startPositionLati,
+          positionProvider.startPositionLongi));
+      walkingOrigenRecorrido.add(LatLng(
+          listaRutaSelected[0].latitude, listaRutaSelected[0].longitude));
+    }
+
+    // _markers2.clear();
+
+    _markers2.add(Marker(
+      markerId: const MarkerId('end3'),
+      position: LatLng(
+          positionProvider.endPositionLati, positionProvider.endPositionLongi),
+      infoWindow: const InfoWindow(
+        title: 'Destino3',
+      ),
+      icon: BitmapDescriptor.fromBytes(markerIcon),
+      draggable: true,
+    ));
+    if (walkingRouteDestiny) {
+      _markers2.add(Marker(
+        markerId: const MarkerId('personDestiny'),
+        position: LatLng(
+            double.parse(rutaSelected[rutaSelected.length - 1].lati),
+            double.parse(rutaSelected[rutaSelected.length - 1].longi)),
+        infoWindow: const InfoWindow(
+          title: 'Person Destiny',
+        ),
+        icon: BitmapDescriptor.fromBytes(walking),
+        draggable: true,
+      ));
+      walkingDestinyRecorrido.add(LatLng(
+          positionProvider.endPositionLati, positionProvider.endPositionLongi));
+      walkingDestinyRecorrido.add(LatLng(
+          listaRutaSelected[listaRutaSelected.length - 1].latitude,
+          listaRutaSelected[listaRutaSelected.length - 1].longitude));
+    }
+
+    setState(() {});
+    _polyline.add(Polyline(
+        polylineId: PolylineId('9'),
+        points: listaRutaSelected,
+        color: Colors.green,
+        width: 7,
+        jointType: JointType.bevel,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap));
+    if (walkingRouteOrigen) {
+      _polyline.add(Polyline(
+          polylineId: PolylineId('10'),
+          points: walkingOrigenRecorrido,
+          color: Colors.brown,
+          width: 3,
+          jointType: JointType.mitered,
+          geodesic: true,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap));
+    }
+    if (walkingRouteDestiny) {
+      _polyline.add(Polyline(
+          polylineId: PolylineId('11'),
+          points: walkingDestinyRecorrido,
+          color: Colors.brown,
+          width: 3,
+          jointType: JointType.mitered,
+          geodesic: true,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap));
+    }
+
+    setState(() {
+      loadingScreen = false;
+    });
+  }
+
+  micro(int lineaMicro) {
     switch (lineaMicro) {
       case 1:
         {
@@ -702,7 +763,50 @@ class _MapViewState extends State<MapView> {
         }
         break;
     }
+  }
 
+  loadData() async {
+    var color = _puntos[0].color;
+    Color colores = Colors.green;
+    switch (color) {
+      case 'Blanco':
+        {
+          colores = Colors.white;
+        }
+        break;
+
+      case 'Rojo':
+        {
+          colores = Colors.red;
+        }
+        break;
+
+      case 'Azul':
+        {
+          colores = Colors.blue;
+        }
+        break;
+
+      case 'Green':
+        {
+          colores = Colors.green;
+        }
+        break;
+
+      case 'Celeste':
+        {
+          colores = Colors.lightBlue;
+        }
+        break;
+
+      case 'Castano':
+        {
+          colores = Colors.orange[900]!;
+        }
+        break;
+    }
+    int lineaMicro = _puntos[0].lineaId;
+    micro(lineaMicro);
     var camino = 'Ida';
     if (_puntos[0].recorridoId % 2 == 0) {
       camino = 'Vuelta';
@@ -751,67 +855,7 @@ class _MapViewState extends State<MapView> {
 
   loadData2() async {
     int lineaMicro = _puntos2[0].lineaId;
-    switch (lineaMicro) {
-      case 1:
-        {
-          lineaMicro = 1;
-        }
-        break;
-
-      case 2:
-        {
-          lineaMicro = 2;
-        }
-        break;
-
-      case 3:
-        {
-          lineaMicro = 5;
-        }
-        break;
-
-      case 4:
-        {
-          lineaMicro = 8;
-        }
-        break;
-
-      case 5:
-        {
-          lineaMicro = 9;
-        }
-        break;
-
-      case 6:
-        {
-          lineaMicro = 10;
-        }
-        break;
-
-      case 7:
-        {
-          lineaMicro = 11;
-        }
-        break;
-
-      case 8:
-        {
-          lineaMicro = 16;
-        }
-        break;
-
-      case 9:
-        {
-          lineaMicro = 17;
-        }
-        break;
-
-      case 10:
-        {
-          lineaMicro = 18;
-        }
-        break;
-    }
+    micro(lineaMicro);
 
     var camino = 'Ida';
     if (_puntos2[0].recorridoId % 2 == 0) {
@@ -838,7 +882,7 @@ class _MapViewState extends State<MapView> {
       ),
       icon: BitmapDescriptor.defaultMarker,
     ));
-    for (int i = 0; i < latlng.length; i++) {
+    for (int i = 0; i < latlng2.length; i++) {
       setState(() {});
       _polyline.add(Polyline(
           polylineId: PolylineId('2'),
@@ -859,329 +903,92 @@ class _MapViewState extends State<MapView> {
     ));
   }
 
+  loadData5() async {
+    int lineaMicro = _puntos3[0].lineaId;
+    micro(lineaMicro);
+
+    var camino = 'Ida';
+    if (_puntos3[0].recorridoId % 2 == 0) {
+      camino = 'Vuelta';
+    }
+
+    int l = latlng3.length - 1;
+    List<Placemark> placemarks3 = await placemarkFromCoordinates(
+        latlng3[0].latitude, latlng3[0].longitude);
+    direccion3 = placemarks3.reversed.last.thoroughfare.toString();
+
+    List<Placemark> placemarks4 = await placemarkFromCoordinates(
+        latlng3[l].latitude, latlng3[l].longitude);
+    direccion4 = placemarks4.reversed.last.thoroughfare.toString();
+
+    final Uint8List markerIcon2 = await getBytesFromAssets(images, 125);
+
+    _markers.add(Marker(
+      markerId: MarkerId(1.toString()),
+      position: latlng3[0],
+      infoWindow: InfoWindow(
+        title: 'Inicio $direccion3',
+        snippet: 'Linea de $lineaMicro de $camino',
+      ),
+      icon: BitmapDescriptor.defaultMarker,
+    ));
+    for (int i = 0; i < latlng3.length; i++) {
+      setState(() {});
+      _polyline.add(Polyline(
+          polylineId: PolylineId('3'),
+          points: latlng3,
+          color: Colors.red,
+          width: 7,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap));
+    }
+    _markers.add(Marker(
+      markerId: MarkerId(l.toString()),
+      position: latlng3[l],
+      infoWindow: InfoWindow(
+        title: 'Fin $direccion4',
+        snippet: 'Linea de $lineaMicro de $camino',
+      ),
+      icon: BitmapDescriptor.fromBytes(markerIcon2),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('Se están dibujando los widgets');
+
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final size = MediaQuery.of(context).size;
     if (recorridos != 0) {
       //Lineas
-      return SizedBox(
-        width: size.width,
-        height: size.height,
-        child: Center(
-            child: Consumer<PuntosProvider>(builder: (context, value, child) {
-          if (value.punto == null) {
-            return const LoadingPage2();
-          }
-          return GoogleMap(
-            initialCameraPosition: _kGooglePlex,
-            markers: _markers,
-            compassEnabled: false,
-            myLocationEnabled: true,
-            zoomControlsEnabled: false,
-            myLocationButtonEnabled: false,
-            onMapCreated: (controller) =>
-                mapBloc.add(OnMapInitialzedEvent(controller)),
-            polylines: _polyline,
-          );
-        })),
-      );
-    } else if (origens != null) {
-      //Buscador
-      return SizedBox(
-        width: size.width,
-        height: size.height,
-        child: (_markers2.isEmpty || loadingScreen == true)
-            ? const LoadingPage2()
-            : Stack(
-                children: [
-                  GoogleMap(
-                    initialCameraPosition: _kGooglePlex,
-                    markers: _markers2,
-                    compassEnabled: false,
-                    myLocationEnabled: true,
-                    zoomControlsEnabled: false,
-                    myLocationButtonEnabled: false,
-                    polylines: _polyline,
-                    onMapCreated: (controller) =>
-                        mapBloc.add(OnMapInitialzedEvent(controller)),
-                  ),
-                  (microLinea.isNotEmpty)
-                      ? Stack(
-                          children: [
-                            Container(
-                              width: 800,
-                              height: 130,
-                              padding: EdgeInsets.symmetric(vertical: 5),
-                              margin:
-                                  EdgeInsets.only(top: 50, right: 50, left: 50),
-                              decoration: BoxDecoration(
-                                color: Colors.green[900],
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: Offset(
-                                        0, 3), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              child: ListTile(
-                                title: Row(
-                                  children: [
-                                    Text(
-                                      "Línea: ",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      microLinea.first.code,
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Distancia: ",
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        (distanceStartOneRoute != 0)
-                                            ? Text(
-                                                distanceStartOneRoute
-                                                        .toString() +
-                                                    " Km.",
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              )
-                                            : Text(
-                                                distanceEndOneRoute.toString() +
-                                                    " Km.",
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Tiempo: ",
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        (timeOneRouteStart != 0)
-                                            ? Text(
-                                                timeOneRouteStart.toString() +
-                                                    " min.",
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              )
-                                            : Text(
-                                                timeOneRouteEnd.toString() +
-                                                    " min.",
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.white,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Velocidad: ",
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          microLinea.first.velocidad
-                                                  .toString() +
-                                              " Km/h",
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.white,
-                                               fontStyle: FontStyle.italic),
-                                        ),
-                                      ],
-                                    ),
-
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Información: ",
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          microLinea.first.telefono,
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.white,
-                                              fontStyle: FontStyle.italic),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      width: 150,
-                                      child: Text(
-                                        microLinea.first.descripcionMicro +
-                                            ". " +
-                                            microLinea.first.descripcionLinea,
-                                        maxLines: 4,
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.white,
-                                            fontStyle: FontStyle.italic),
-                                      ),
-                                    ),
-
-                                    // Text(
-                                    //   "Descripción de la Línea: " + microLinea.first.descripcionLinea,
-                                    //   style: TextStyle(
-                                    //       fontSize: 10,
-                                    //       color: Colors.white,
-                                    //       fontStyle: FontStyle.italic),
-                                    // ),
-                                  ],
-                                ),
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(90),
-                                  child: Image.asset(
-                                    microLinea.first.foto,
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                    scale: 10,
-                                  ),
-                                ),
-                                // trailing: Icon(
-                                //   Icons.visibility,
-                                //   color: Colors.white,
-                                // ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              margin: EdgeInsets.only(
-                                  top: 550, right: 100, left: 100),
-                              decoration: BoxDecoration(
-                                color: Colors.green[900],
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: Offset(
-                                        0, 3), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              child: ListTile(
-                                title: const Text(
-                                  "Ver Sugerencias",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                      fontStyle: FontStyle.italic),
-                                ),
-                                trailing: Icon(
-                                  Icons.visibility,
-                                  color: Colors.white,
-                                ),
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, 'recommendation');
-                                },
-                              ),
-                            ),
-                          ],
-                        )
-                      : Container(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          margin:
-                              EdgeInsets.only(top: 450, right: 100, left: 100),
-                          decoration: BoxDecoration(
-                            color: Colors.green[900],
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset:
-                                    Offset(0, 3), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: ListTile(
-                            title: const Text(
-                              "Ver Ruta óptima",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                  fontStyle: FontStyle.italic),
-                            ),
-                            trailing: Icon(
-                              Icons.visibility,
-                              color: Colors.white,
-                            ),
-                            onTap: () {
-                              setState(() {
-                                loadData4();
-                                loadingScreen = true;
-                              });
-                            },
-                          ),
-                        ),
-                  Container(
+      return Material(
+        child: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: Center(
+              child: Consumer<PuntosProvider>(builder: (context, value, child) {
+            if (value.punto == null) {
+              return const LoadingPage2();
+            }
+            return Stack(
+              children: [
+                GoogleMap(
+                  initialCameraPosition: _kGooglePlex,
+                  markers: _markers,
+                  compassEnabled: false,
+                  myLocationEnabled: true,
+                  zoomControlsEnabled: false,
+                  myLocationButtonEnabled: false,
+                  onMapCreated: (controller) =>
+                      mapBloc.add(OnMapInitialzedEvent(controller)),
+                  polylines: _polyline,
+                ),
+                Container(
                     padding: EdgeInsets.symmetric(vertical: 10),
-                    margin: EdgeInsets.only(top: 550, right: 100, left: 100),
+                    margin: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height - 150,
+                        right: 100,
+                        left: 100),
                     decoration: BoxDecoration(
                       color: Colors.green[900],
                       borderRadius: BorderRadius.only(
@@ -1201,37 +1008,280 @@ class _MapViewState extends State<MapView> {
                     ),
                     child: ListTile(
                       title: const Text(
-                        "Ver Sugerencias",
+                        "Limpiar",
                         style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
                             fontStyle: FontStyle.italic),
                       ),
                       trailing: Icon(
-                        Icons.visibility,
+                        Icons.cleaning_services,
                         color: Colors.white,
                       ),
-                      onTap: () {
-                        Navigator.pushNamed(context, 'recommendation');
+                      onTap: () async {
+                        setState(() {
+                          loadingScreen = true;
+                        });
+
+                        origens = null;
+                        recorridos = 0;
+                        setState(() {
+                          loadingScreen = false;
+                        });
                       },
+                    )),
+              ],
+            );
+          })),
+        ),
+      );
+    } else if (origens != null) {
+      //Buscador
+      return Material(
+        child: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: (loadingScreen == true)
+              ? const LoadingPage2()
+              : Stack(
+                  children: [
+                    GoogleMap(
+                      initialCameraPosition: _kGooglePlex,
+                      markers: _markers2,
+                      compassEnabled: false,
+                      myLocationEnabled: true,
+                      zoomControlsEnabled: false,
+                      myLocationButtonEnabled: false,
+                      polylines: _polyline,
+                      onMapCreated: (controller) =>
+                          mapBloc.add(OnMapInitialzedEvent(controller)),
                     ),
-                  ),
-                ],
-              ),
+                    Column(
+                      children: [
+                        Container(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            margin: EdgeInsets.only(
+                                top: MediaQuery.of(context).size.height - 250,
+                                right: 100,
+                                left: 100),
+                            decoration: BoxDecoration(
+                              color: Colors.green[900],
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                                bottomLeft: Radius.circular(10),
+                                bottomRight: Radius.circular(10),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: Offset(
+                                      0, 3), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              title: const Text(
+                                "Planificador de Viajes",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontStyle: FontStyle.italic),
+                              ),
+                              trailing: Icon(
+                                Icons.visibility,
+                                color: Colors.white,
+                              ),
+                              onTap: () async {
+                                setState(() {
+                                  loadingScreen = true;
+                                });
+                                final positionProvider =
+                                    Provider.of<PositionProvider>(context,
+                                        listen: false);
+
+                                if (positionProvider.recorridoSelected == 0 ||
+                                    positionProvider.recorridosShowed ==
+                                        false) {
+                                  await loadData4();
+                                  if (findMicroEmpty == true) {
+                                    final snackBar = SnackBar(
+                                      /// need to set following properties for best effect of awesome_snackbar_content
+                                      elevation: 10,
+                                      behavior: SnackBarBehavior.fixed,
+                                      backgroundColor:
+                                          ui.Color.fromRGBO(0, 0, 0, 0),
+                                      duration: Duration(milliseconds: 3000),
+                                      content: AwesomeSnackbarContent(
+                                        title: messageTitle,
+                                        message: messageSubtitle,
+
+                                        /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                        contentType: ContentType.failure,
+                                      ),
+                                    );
+
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar()
+                                      ..showSnackBar(snackBar);
+
+                                    return;
+                                  }
+
+                                  findMicroEmpty = false;
+
+                                  positionProvider.micros = microLinea;
+                                  positionProvider.distances = distanceOneRoute;
+                                } else {
+                                  microLinea = positionProvider.micros;
+                                  distanceOneRoute = positionProvider.distances;
+                                }
+
+                                positionProvider.recorridoSelected = 99;
+                                positionProvider.recorridosShowed = true;
+                                nearestMicrosOrigen = [];
+                                nearestMicrosDestiny = [];
+
+                                setState(() {});
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => MicrosListPage(
+                                            microLinea, distanceOneRoute)));
+                              },
+                            )),
+                        Container(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            margin:
+                                EdgeInsets.only(top: 25, right: 100, left: 100),
+                            decoration: BoxDecoration(
+                              color: Colors.green[900],
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                                bottomLeft: Radius.circular(10),
+                                bottomRight: Radius.circular(10),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 5,
+                                  blurRadius: 7,
+                                  offset: Offset(
+                                      0, 3), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              title: const Text(
+                                "Limpiar",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontStyle: FontStyle.italic),
+                              ),
+                              trailing: Icon(
+                                Icons.cleaning_services,
+                                color: Colors.white,
+                              ),
+                              onTap: () async {
+                                setState(() {
+                                  loadingScreen = true;
+                                });
+
+                                origens = null;
+                                recorridos = 0;
+                                setState(() {
+                                  loadingScreen = false;
+                                });
+                              },
+                            )),
+                      ],
+                    ),
+                    Positioned(
+                        left: MediaQuery.of(context).size.width - 68,
+                        top: MediaQuery.of(context).size.height - 195,
+                        child: SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: FloatingActionButton(
+                            heroTag: 'btnDrawerRoute',
+                            backgroundColor: Colors.green[800],
+                            onPressed: () => Scaffold.of(context).openDrawer(),
+                            child: const Icon(
+                              Icons.search,
+                            ),
+                          ),
+                        )),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 18,
+                      height: MediaQuery.of(context).size.height - 15,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: const [
+                              Btnprincipales(),
+                              BtnCurrentLocation()
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       );
     } else {
       //Normal
-      return SizedBox(
-        width: size.width,
-        height: size.height,
-        child: GoogleMap(
-          initialCameraPosition: _kGooglePlex,
-          compassEnabled: false,
-          myLocationEnabled: true,
-          zoomControlsEnabled: false,
-          myLocationButtonEnabled: false,
-          onMapCreated: (controller) =>
-              mapBloc.add(OnMapInitialzedEvent(controller)),
+      return Material(
+        child: Stack(
+          children: [
+            SizedBox(
+              width: size.width,
+              height: size.height,
+              child: GoogleMap(
+                initialCameraPosition: _kGooglePlex,
+                compassEnabled: false,
+                myLocationEnabled: true,
+                zoomControlsEnabled: false,
+                myLocationButtonEnabled: false,
+                onMapCreated: (controller) =>
+                    mapBloc.add(OnMapInitialzedEvent(controller)),
+              ),
+            ),
+            Positioned(
+                left: MediaQuery.of(context).size.width - 68,
+                top: MediaQuery.of(context).size.height - 195,
+                child: SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: FloatingActionButton(
+                    heroTag: 'btnDrawerRoute',
+                    backgroundColor: Colors.green[800],
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                    child: const Icon(
+                      Icons.search,
+                    ),
+                  ),
+                )),
+            SizedBox(
+              width: MediaQuery.of(context).size.width - 18,
+              height: MediaQuery.of(context).size.height - 15,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [Btnprincipales(), BtnCurrentLocation()],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       );
     }

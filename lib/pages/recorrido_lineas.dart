@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_place/google_place.dart';
 import 'package:trip_planner/blocs/blocs.dart';
-import 'package:trip_planner/views/map_view_copy.dart';
-import 'package:trip_planner/widgets/my_float_action_button.dart';
+import 'package:trip_planner/views/map_view.dart';
 import 'package:trip_planner/widgets/my_searching_drawer.dart';
 import 'package:trip_planner/widgets/widgets.dart';
 
@@ -71,25 +70,6 @@ class _RecorridoLineasState extends State<RecorridoLineas> {
                 children: [
                   MapView(recorridos, pares, origen, destino,
                       state.lastKnownLocation!),
-                  //buttom para atras
-                  /*Positioned(
-                    left: 15,
-                    top: 15,
-                    child: SafeArea(
-                      child: CupertinoButton(
-                        color: Colors.black26,
-                        padding: const EdgeInsets.all(10),
-                        borderRadius: BorderRadius.circular(40),
-                        child: Icon(Icons.arrow_back_outlined),
-                        onPressed: () {
-                          Navigator.pushNamed(context, 'home');
-                        },
-                      ),
-                    ),
-                  ),*/
-
-                  //BUSCADOR
-                  //const SearchBar(),
                    Positioned(
                        left: MediaQuery.of(context).size.width - 68,
                        top: MediaQuery.of(context).size.height - 195,

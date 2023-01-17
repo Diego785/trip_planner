@@ -11,6 +11,7 @@ String puntosModelToJson(List<PuntosModel> data) => json.encode(List<dynamic>.fr
 class PuntosModel {
     PuntosModel({
         required this.id,
+        required this.fidStops2,
         required this.longi,
         required this.lati,
         required this.recorridoId,
@@ -19,6 +20,7 @@ class PuntosModel {
     });
 
     int id;
+    String fidStops2;
     String longi;
     String lati; 
     int recorridoId;
@@ -27,6 +29,7 @@ class PuntosModel {
 
     factory PuntosModel.fromJson(Map<String, dynamic> json) => PuntosModel(
         id: json["id"],
+        fidStops2: json["FID_stops2"],
         longi: json["longi"],
         lati: json["lati"],
         recorridoId: json["recorrido_id"],
@@ -36,6 +39,7 @@ class PuntosModel {
 
     Map<String, dynamic> toJson() => {
         "id": id,
+        "FID_stops2": fidStops2,
         "longi": longi,
         "lati": lati,
         "recorrido_id": recorridoId,

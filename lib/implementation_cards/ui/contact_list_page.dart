@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:trip_planner/implementation_cards/template_trip_planner_app.dart';
 import 'package:trip_planner/implementation_cards/ui/contact_detail_screen.dart';
 import 'package:trip_planner/implementation_cards/ui/widgets/cards.dart';
 import 'package:trip_planner/implementation_cards/ui/widgets/perspective_list_view.dart';
 import 'package:trip_planner/models/specific_line.dart';
-import 'package:trip_planner/views/map_view_copy.dart';
 import 'package:trip_planner/widgets/my_searching_drawer.dart';
 
 class MicrosListPage extends StatefulWidget {

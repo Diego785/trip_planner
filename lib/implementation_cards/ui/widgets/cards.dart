@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:trip_planner/models/specific_line.dart';
 import 'package:trip_planner/providers/position_provider.dart';
-import 'package:trip_planner/views/map_view_copy.dart';
+import 'package:trip_planner/views/map_view.dart';
 
 class MicrosCard extends StatelessWidget {
   MicrosCard({
@@ -15,6 +15,7 @@ class MicrosCard extends StatelessWidget {
   });
 
   final Color borderColor;
+  
   SpecificLine micros;
   double distances;
   bool dataComplete;

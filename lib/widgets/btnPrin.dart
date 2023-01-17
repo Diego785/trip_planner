@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:trip_planner/pages/recorrido_lineas.dart';
 import 'package:trip_planner/screens/screens.dart';
 
 class Btnprincipales extends StatelessWidget {
@@ -35,38 +34,6 @@ class Btnprincipales extends StatelessWidget {
                 }),
           ),
         ),
-        // Container(
-        //   margin: const EdgeInsets.only(bottom: 10),
-        //   child: CircleAvatar(
-        //     backgroundColor: Colors.white,
-        //     maxRadius: 25,
-        //     child: IconButton(
-        //         icon: const Icon(Icons.bus_alert, color: Colors.black),
-        //         onPressed: () {}),
-        //   ),
-        // ),
-        // Container(
-        //   margin: const EdgeInsets.only(bottom: 10),
-        //   child: CircleAvatar(
-        //     backgroundColor: Colors.green[800],
-        //     maxRadius: 25,
-        //     child: IconButton(
-        //         icon: const Icon(Icons.arrow_back, color: Colors.white),
-        //         onPressed: () {
-        //           Navigator.push(
-        //             context,
-        //             MaterialPageRoute(
-        //               builder: (context) => const RecorridoLineas(
-        //                   0,
-        //                   0,
-        //                   null, 
-        //                   null
-        //               )
-        //             )
-        //           );
-        //         }),
-        //   ),
-        // ),
       ],
     );
   }

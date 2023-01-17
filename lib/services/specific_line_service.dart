@@ -12,8 +12,6 @@ class LineServices {
     var params = {"recorrido": recorrido.toString()};
     final urlPrincipal = ServerProvider().url;
     final url = Uri.parse('$urlPrincipal/api/recorridoLinea');
-    // final url =
-    //     Uri.parse("http://10.0.2.2/trip_planner_bd/public/api/recorridoLinea");
     final urlP = url.replace(queryParameters: params);
     final response = await http.get(urlP, headers: {
       'Content-Type': 'application/json',
@@ -21,7 +19,6 @@ class LineServices {
     });
     if (200 == response.statusCode) {
       final respuesta = jsonDecode(response.body);
-      // print('aeea');
       micro = specificLineFromJson(jsonEncode(respuesta));
       return micro;
     } else {

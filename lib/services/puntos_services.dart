@@ -17,7 +17,6 @@ class PuntosService {
     });
     if (200 == response.statusCode) {
       final respuesta = jsonDecode(response.body);
-      // print('aeea');
       final List<PuntosModel> puntos =
           puntosModelFromJson(jsonEncode(respuesta['data']));
       return puntos;
@@ -38,7 +37,6 @@ class PuntosService {
     });
     if (200 == response.statusCode) {
       final respuesta = jsonDecode(response.body);
-      // print('aeea');
       final List<RutaModel> puntos =
           rutaModelFromJson(jsonEncode(respuesta['data']));
       return puntos;
