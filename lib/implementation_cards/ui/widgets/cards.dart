@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:trip_planner/implementation_cards/models/contact.dart';
 import 'package:trip_planner/models/specific_line.dart';
 import 'package:trip_planner/providers/position_provider.dart';
 import 'package:trip_planner/views/map_view_copy.dart';
@@ -9,7 +8,6 @@ import 'package:trip_planner/views/map_view_copy.dart';
 class MicrosCard extends StatelessWidget {
   MicrosCard({
     required this.borderColor,
-    required this.contact,
     required this.micros,
     required this.distances,
     this.dataComplete = false,
@@ -17,7 +15,6 @@ class MicrosCard extends StatelessWidget {
   });
 
   final Color borderColor;
-  final Contact contact;
   SpecificLine micros;
   double distances;
   bool dataComplete;

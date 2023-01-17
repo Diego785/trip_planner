@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trip_planner/complements/loading_page.dart';
+import 'package:trip_planner/complements/loading_page2.dart';
 import 'package:trip_planner/helpers/helpers.dart';
 import 'package:trip_planner/models/models.dart';
 import 'package:trip_planner/providers/providers.dart';
@@ -185,7 +185,7 @@ class _MapPolylinesScreenState extends State<MapPolylinesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_polyline.isEmpty) return const LoadingPage();
+    if (_polyline.isEmpty) return const LoadingPage2();
 
     return Scaffold(body: Center(
         child: Consumer<PuntosProvider>(builder: (context, value, child) {
