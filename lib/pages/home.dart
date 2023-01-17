@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:trip_planner/complements/loading_page.dart';
 import 'package:trip_planner/ui/responsive.dart';
 import 'package:trip_planner/widgets/my_float_action_button.dart';
 import 'package:trip_planner/widgets/my_searching_drawer.dart';

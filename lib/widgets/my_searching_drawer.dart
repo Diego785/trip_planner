@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:trip_planner/complements/loading_page.dart';
+import 'package:trip_planner/complements/loading_page2.dart';
 import 'package:trip_planner/models/linea.dart';
-import 'package:trip_planner/models/lineas.dart';
 import 'package:http/http.dart' as http;
 import 'package:trip_planner/pages/recorrido_lineas.dart';
 import 'package:trip_planner/screens/screens.dart';
@@ -103,7 +102,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
   @override
   Widget build(BuildContext context) {
     if (_listLineasGet.isEmpty && _listLineasGet2.isEmpty) {
-      return const LoadingPage();
+      return const LoadingPage2();
     } else {
       return Drawer(
         child: ListView(
@@ -439,7 +438,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       color: Colors
                                                                           .white),
                                                                 ),
@@ -452,7 +451,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontStyle
                                                                               .italic,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
@@ -478,7 +477,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       color: Colors
                                                                           .white),
                                                                 ),
@@ -491,7 +490,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontStyle
                                                                               .italic,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
@@ -517,7 +516,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       color: Colors
                                                                           .white),
                                                                 ),
@@ -530,7 +529,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontStyle
                                                                               .italic,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
@@ -556,7 +555,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       color: Colors
                                                                           .white),
                                                                 ),
@@ -569,7 +568,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontStyle
                                                                               .italic,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
@@ -595,7 +594,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       color: Colors
                                                                           .white),
                                                                 ),
@@ -608,7 +607,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontStyle
                                                                               .italic,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
@@ -633,7 +632,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                          20,
+                                                                          15,
                                                                       color: Colors
                                                                           .white),
                                                                 ),
@@ -648,7 +647,7 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                                                                             FontStyle
                                                                                 .italic,
                                                                         fontSize:
-                                                                            20,
+                                                                            15,
                                                                         fontWeight:
                                                                             FontWeight
                                                                                 .bold,

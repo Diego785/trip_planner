@@ -14,7 +14,6 @@ Future<List<RutaModel>> getRuta() async {
 
   if (200 == response.statusCode) {
     final respuesta = jsonDecode(response.body);
-    // print('aeea');
     final List<RutaModel> puntos =
         rutaModelFromJson(jsonEncode(respuesta['data']));
     return puntos;

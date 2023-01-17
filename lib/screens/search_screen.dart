@@ -193,6 +193,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
                         positionProvider.recorridoSelected = 0;
                         positionProvider.recorridosShowed = false;
+                        
 
                         if (startPosition != null && endPosition != null) {
                           Navigator.push(

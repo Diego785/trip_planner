@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:trip_planner/implementation_cards/models/contact.dart';
-import 'package:trip_planner/implementation_cards/template_trip_planner_app.dart';
 import 'package:trip_planner/implementation_cards/ui/contact_detail_screen.dart';
 import 'package:trip_planner/implementation_cards/ui/widgets/cards.dart';
 import 'package:trip_planner/implementation_cards/ui/widgets/perspective_list_view.dart';
 import 'package:trip_planner/models/specific_line.dart';
-import 'package:trip_planner/views/map_view_copy.dart';
 import 'package:trip_planner/widgets/my_searching_drawer.dart';
 
 class MicrosListPage extends StatefulWidget {
@@ -68,9 +65,8 @@ class MicrosListPageState extends State<MicrosListPage> {
               context,
               MaterialPageRoute<dynamic>(
                 builder: (_) => ContactDetailScreen(
-                  contact: Contact.contacts[index],
                   color: color,
-                  micro: widget.micros[index],
+                  micro: widget.micros[widget.micros.length - index - 1],
                   distance:
                       widget.distances[widget.distances.length - index - 1],
                 ),
@@ -79,13 +75,11 @@ class MicrosListPageState extends State<MicrosListPage> {
           },
           children: List.generate(widget.micros.length, (index) {
             final borderColor = Colors.accents[index % Colors.accents.length];
-            final contact = Contact.contacts[index];
-            final micros = widget.micros[index];
+            final micros = widget.micros[widget.micros.length - index - 1];
             final distances =
                 widget.distances[widget.distances.length - index - 1];
             return MicrosCard(
               borderColor: borderColor,
-              contact: contact,
               micros: micros,
               distances: distances,
             );
