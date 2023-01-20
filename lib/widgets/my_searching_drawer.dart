@@ -138,57 +138,6 @@ class _MySearchingDrawerState extends State<MySearchingDrawer> {
                   const SizedBox(
                     height: 20,
                   ),
-                  //IMPLEMEN
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      //IMPLEMENTAR LA SEGUNDA FUNCIONALIDAD
-                      Column(
-                        children: [
-                          FloatingActionButton(
-                            backgroundColor: Colors.green[800],
-                            onPressed: () => {},
-                            child: const Icon(
-                              Icons.place,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            "2da. Funcionalidad",
-                            style: TextStyle(
-                                color: Colors.green[900], fontSize: 13),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 50,
-                      ),
-                      //IMPLEMENTAR LA TERCERA FUNCIONALIDAD
-                      Column(
-                        children: [
-                          FloatingActionButton(
-                            backgroundColor: Colors.green[800],
-                            onPressed: () => {},
-                            child: const Icon(
-                              Icons.bus_alert,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            "3ra. Funcionalidad",
-                            style: TextStyle(
-                                color: Colors.green[900], fontSize: 13),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
                   Container(
                     padding: const EdgeInsets.all(20),
                     width: 1000,
